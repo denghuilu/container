@@ -1,0 +1,4 @@
+"/Users/Eric/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/223.8617.54/CLion.app/Contents/bin/cmake/mac/bin/cmake" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=/Users/Eric/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/223.8617.54/CLion.app/Contents/bin/ninja/mac/ninja" -G Ninja -S /Users/Eric/Documents/GitHub/container -B /Users/Eric/Documents/GitHub/container/build/container
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/Eric/Documents/GitHub/container/build/container
