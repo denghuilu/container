@@ -1,10 +1,12 @@
 #include <complex>
 #include <iostream>
 
+#include "gpu_allocator.h"
 #include "tensor.h"
 
 int main() {
 
+    container::GPUAllocator gpu_alloc{};
     container::Tensor t1(container::DataType::DT_FLOAT, container::TensorShape({2, 3, 4}));
     container::Tensor t2(container::DataType::DT_COMPLEX_DOUBLE, container::TensorShape({3, 4}));
 

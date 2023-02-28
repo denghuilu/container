@@ -1,4 +1,3 @@
-#include <cstdlib> // for ::operator new, ::operator delete
 #include <cassert> // for assert
 #include <cuda_runtime.h> // for CUDA APIs
 
