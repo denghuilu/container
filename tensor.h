@@ -8,7 +8,7 @@
 #include "tensor_shape.h"
 #include "tensor_buffer.h"
 
-namespace ABACUS {
+namespace container {
 
 /**
  * @brief A multi-dimensional array of elements of a single data type.
@@ -196,5 +196,6 @@ private:
  */
 std::ostream& operator<<(std::ostream& os, const Tensor& tensor);
 
-}
+} // namespace container
+
 #endif // MODULE_BASE_CONTAINER_TENSOR_H

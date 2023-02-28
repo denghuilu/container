@@ -5,8 +5,8 @@
 
 int main() {
 
-    ABACUS::Tensor t1(DataType::DT_FLOAT, ABACUS::TensorShape({2, 3, 4}));
-    ABACUS::Tensor t2(DataType::DT_COMPLEX_DOUBLE, ABACUS::TensorShape({3, 4}));
+    container::Tensor t1(container::DataType::DT_FLOAT, container::TensorShape({2, 3, 4}));
+    container::Tensor t2(container::DataType::DT_COMPLEX_DOUBLE, container::TensorShape({3, 4}));
 
     auto * t1_data = t1.data<float>();
     auto * t2_data = t2.data<std::complex<double>>();
@@ -18,8 +18,8 @@ int main() {
         t2_data[ii] = {1.0, 0.0};
     }
 
-    ABACUS::Tensor t3(t1_data, t1.data_type(), t1.shape());
-    const ABACUS::Tensor& t4 = t2;
+    container::Tensor t3(t1_data, t1.data_type(), t1.shape());
+    const container::Tensor& t4 = t2;
 
 
     std::cout << t1 << std::endl;

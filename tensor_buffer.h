@@ -6,7 +6,7 @@
 #include "allocator.h"
 #include "tensor_types.h"
 
-namespace ABACUS {
+namespace container {
 
 /**
  * @brief Interface to access the raw ref-counted data buffer.
@@ -98,6 +98,6 @@ namespace ABACUS {
      bool owns_memory; ///< Bool to indicate whether this tensor owns it's memory.
 };
 
-}  // namespace abacus
+}  // namespace container
 
 #endif  // MODULE_BASE_CONTAINER_TENSOR_BUFFER_H_

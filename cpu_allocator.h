@@ -3,7 +3,7 @@
 
 #include "allocator.h"
 
-namespace ABACUS {
+namespace container {
 
 /**
  * @brief An Allocator subclass for CPU memory.
@@ -58,6 +58,6 @@ class CPUAllocator : public Allocator {
     AllocatorMemoryType GetMemoryType() override;
 };
 
-} // namespace ABACUS
+} // namespace container
 
 #endif // MODULE_BASE_CONTAINER_CPU_ALLOCATOR_H

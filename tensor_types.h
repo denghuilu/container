@@ -6,6 +6,8 @@
 #define MODULE_BASE_CONTAINER_TENSOR_TYPES_H_
 
 #include <iostream>
+namespace container {
+
 /**
 @brief Enumeration of data types for tensors.
 The DataType enum lists the supported data types for tensors. Each data type
@@ -56,4 +58,5 @@ std::ostream& operator<<(std::ostream& os, const DataType& data_type);
  */
 std::ostream& operator<<(std::ostream& os, const AllocatorMemoryType& memory_type);
 
+} // namespace container
 #endif // MODULE_BASE_CONTAINER_TENSOR_TYPES_H_

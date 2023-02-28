@@ -5,7 +5,7 @@
 #include <iostream>
 #include <initializer_list>
 
-namespace ABACUS {
+namespace container {
 
 /**
  * @brief A class for representing the shape of a tensor.
@@ -106,6 +106,6 @@ private:
  */
 std::ostream& operator<<(std::ostream& os, const TensorShape& shape);
 
-}
+} // container
 
 #endif  // MODULE_BASE_CONTAINER_TENSOR_SHAPE_H_

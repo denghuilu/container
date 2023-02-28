@@ -5,7 +5,7 @@
 
 #include "tensor_types.h"
 
-namespace ABACUS {
+namespace container {
 
 /**
  * @brief An abstract base class for memory allocators.

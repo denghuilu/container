@@ -3,7 +3,7 @@
 
 #include "allocator.h"
 
-namespace ABACUS {
+namespace container {
 
 /**
  * @brief An allocator that allocates memory on a GPU device.

@@ -1,15 +1,8 @@
 #include "tensor_types.h"
 
-/**
- * @brief Overloaded operator<< for the Tensor class.
- *
- * Prints the data type of the enum type DataType.
- *
- * @param os The output stream to write to.
- * @param tensor The Tensor object to print.
- *
- * @return The output stream.
- */
+namespace container {
+// Overloaded operator<< for the Tensor class.
+// Prints the data type of the enum type DataType.
 std::ostream& operator<<(std::ostream& os, const DataType& data_type) {
     switch (data_type) {
         case DataType::DT_FLOAT:
@@ -37,16 +30,8 @@ std::ostream& operator<<(std::ostream& os, const DataType& data_type) {
     return os;
 }
 
-/**
- * @brief Overloaded operator<< for the Tensor class.
- *
- * Prints the memory type of the enum type AllocatorMemoryType.
- *
- * @param os The output stream to write to.
- * @param tensor The Tensor object to print.
- *
- * @return The output stream.
- */
+// Overloaded operator<< for the Tensor class.
+// Prints the memory type of the enum type AllocatorMemoryType.
 std::ostream& operator<<(std::ostream& os, const AllocatorMemoryType& memory_type) {
     switch (memory_type) {
         case AllocatorMemoryType::MT_CPU:
@@ -61,3 +46,5 @@ std::ostream& operator<<(std::ostream& os, const AllocatorMemoryType& memory_typ
     }
     return os;
 }
+
+} // namespace container

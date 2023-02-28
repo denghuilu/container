@@ -1,7 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
-if(POLICY CMP0135) # https://cmake.org/cmake/help/git-stage/policy/CMP0135.html
-    cmake_policy(SET CMP0135 NEW) # Otherwise this policy generates a warning on CMake 3.24
-endif()
+cmake_minimum_required(VERSION 3.20)
 
 project(container
     VERSION 0.0.0
