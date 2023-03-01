@@ -41,12 +41,12 @@ Allocator * TensorBuffer::allocator() const {
 // Check whether this TensorBuffer owns the underlying memory.
 bool TensorBuffer::OwnsMemory() const { return this->owns_memory; }
 
-// Get the type of memory used by the TensorBuffer.
-AllocatorMemoryType TensorBuffer::GetMemoryType() const {
+// Get the type of device used by the TensorBuffer.
+DeviceType TensorBuffer::GetDeviceType() const {
     if (alloc_ != nullptr) {
-        return alloc_->GetMemoryType();
+        return alloc_->GetDeviceType();
     }
-    return AllocatorMemoryType::MT_UNKNOWN;
+    return DeviceType::UnKnown;
 }
 
 }  // namespace container

@@ -21,7 +21,7 @@ public:
      * @brief Constructor with an initializer list of integers.
      * @param dims An initializer list of integers representing the dimensions of the tensor.
      */
-    explicit TensorShape(std::initializer_list<int> dims);
+    TensorShape(std::initializer_list<int> dims);
 
     /**
      * @brief Constructor with a vector of integers.

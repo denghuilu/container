@@ -63,9 +63,9 @@ class Allocator {
     /**
      * @brief Get the type of memory used by the TensorBuffer.
      *
-     * @return AllocatorMemoryType The type of memory used by the TensorBuffer.
+     * @return MemoryType The type of memory used by the TensorBuffer.
      */
-    virtual AllocatorMemoryType GetMemoryType() = 0;
+    virtual DeviceType GetDeviceType() = 0;
 };
 
 } // namespace ABACUS

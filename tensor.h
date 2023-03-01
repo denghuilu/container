@@ -30,26 +30,28 @@ class Tensor {
     Tensor(DataType data_type, const TensorShape& shape);
 
     /**
-     * @brief Constructor that creates a tensor with the given data pointer, data type and shape.
+     * @brief Constructor that creates a tensor with the given data pointer,
+     * data type, device type and shape.
      *
      * This tensor does not own memory.
      *
      * @param data The data pointer.
      * @param data_type The data type of the tensor.
+     * @param device The data type of the tensor.
      * @param shape The shape of the tensor.
      */
-    Tensor(void * data, DataType data_type, const TensorShape& shape);
+    Tensor(void * data, DataType data_type, DeviceType device, const TensorShape& shape);
 
     /**
-     * @brief Construct a new Tensor object with the given data type and shape.
+     * @brief Construct a new Tensor object with the given data type, shape and device type.
      *
-     * The memory for the tensor is allocated using the given allocator.
+     * The memory for the tensor is allocated according to the given device type.
      *
      * @param data_type The data type of the tensor.
      * @param shape The shape of the tensor.
-     * @param allocator The allocator to use for allocating memory for the tensor.
+     * @param device The data type of the tensor.
      */
-    Tensor(DataType data_type, const TensorShape& shape, Allocator* allocator);
+    Tensor(DataType data_type, DeviceType device, const TensorShape& shape);
 
     /**
      * @brief Construct a new Tensor object by copying another Tensor.
@@ -66,6 +68,13 @@ class Tensor {
      * @return The data type of the tensor.
      */
     DataType data_type() const;
+
+    /**
+     * @brief Get the data type of the tensor.
+     *
+     * @return The data type of the tensor.
+     */
+    DeviceType device_type() const;
 
     /**
      * @brief Get the shape of the tensor.
@@ -161,10 +170,25 @@ class Tensor {
     }
 
 private:
+
+    /**
+     * @brief Get the Allocator object according to the given device type.
+     *
+     * @param device The device type.
+     *
+     * @return The related Allocator class pointer.
+     */
+    static Allocator* GetAllocator(DeviceType device);
+
     /**
      * @brief The data type of the tensor.
      */
     DataType data_type_;
+
+    /**
+     * @brief The device type of the tensor.
+     */
+    DeviceType device_;
 
     /**
      * @brief The shape of the tensor.

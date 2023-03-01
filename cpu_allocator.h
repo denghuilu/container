@@ -51,11 +51,11 @@ class CPUAllocator : public Allocator {
     size_t AllocatedSize(void* ptr) override;
 
     /**
-     * @brief Get the type of memory used by the TensorBuffer.
+     * @brief Get the type of device used by the TensorBuffer.
      *
-     * @return AllocatorMemoryType The type of memory used by the TensorBuffer.
+     * @return MemoryType The type of memory used by the TensorBuffer.
      */
-    AllocatorMemoryType GetMemoryType() override;
+    DeviceType GetDeviceType() override;
 };
 
 } // namespace container

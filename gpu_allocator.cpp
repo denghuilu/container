@@ -36,9 +36,9 @@ size_t GPUAllocator::AllocatedSize(void* ptr) {
     return 0;
 }
 
-// Get the type of memory used by the TensorBuffer.
-AllocatorMemoryType GPUAllocator::GetMemoryType() {
-    return AllocatorMemoryType::MT_GPU;
+// Get the type of device used by the TensorBuffer.
+DeviceType GPUAllocator::GetDeviceType() {
+    return DeviceType::GpuDevice;
 }
 
 } // namespace container

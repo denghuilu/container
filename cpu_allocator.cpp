@@ -30,9 +30,9 @@ size_t CPUAllocator::AllocatedSize(void* ptr) {
     return 0;
 }
 
-//  Get the type of memory used by the TensorBuffer.
-AllocatorMemoryType CPUAllocator::GetMemoryType() {
-    return AllocatorMemoryType::MT_CPU;
+//  Get the type of device used by the TensorBuffer.
+DeviceType CPUAllocator::GetDeviceType() {
+    return DeviceType::CpuDevice;
 }
 
 } // namespace container

@@ -86,11 +86,11 @@ namespace container {
      virtual bool OwnsMemory() const;
 
      /**
-      * @brief Get the type of memory used by the TensorBuffer.
+      * @brief Get the type of device used by the TensorBuffer.
       *
-      * @return AllocatorMemoryType The type of memory used by the TensorBuffer.
+      * @return MemoryType The type of memory used by the TensorBuffer.
       */
-     AllocatorMemoryType GetMemoryType() const;
+     DeviceType GetDeviceType() const;
 
    private:
      void* const data_;  ///< Pointer to the underlying data buffer.

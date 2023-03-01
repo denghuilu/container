@@ -4,41 +4,51 @@
 
 #include "tensor.h"
 #include "cpu_allocator.h"
-
+#if defined(__CUDA)
+#include "gpu_allocator.h"
+#endif // __CUDA
 namespace container {
 
 // Constructor that creates a tensor with the given data type and shape using the default allocator.
 Tensor::Tensor(DataType data_type, const TensorShape& shape)
         : data_type_(data_type),
           shape_(shape),
-          allocator_(new CPUAllocator()),
-          buffer_(allocator_, allocator_->allocate(shape.NumElements() * SizeOfType(data_type))) {}
+          device_(DeviceType::CpuDevice),
+          allocator_(GetAllocator(device_)),
+          buffer_(allocator_, allocator_->allocate(shape.NumElements() * SizeOfType(data_type))) {
+}
 
-// Constructor that creates a tensor with the given data pointer, data type and shape.
-Tensor::Tensor(void *data, DataType data_type, const TensorShape &shape)
+// Constructor that creates a tensor with the given data pointer, data type, device type and shape.
+Tensor::Tensor(void *data, DataType data_type, DeviceType device, const TensorShape &shape)
         : data_type_(data_type),
           shape_(shape),
-          allocator_(),
+          device_(device),
+          allocator_(GetAllocator(device_)),
           buffer_(data) {}
 
 // Construct a new Tensor object with the given data type and shape.
-Tensor::Tensor(DataType data_type, const TensorShape& shape, Allocator* allocator)
+Tensor::Tensor(DataType data_type, DeviceType device, const TensorShape& shape)
         : data_type_(data_type),
           shape_(shape),
-          allocator_(allocator),
+          device_(device),
+          allocator_(GetAllocator(device_)),
           buffer_(allocator_, allocator_->allocate(shape.NumElements() * SizeOfType(data_type))) {}
 
 // Construct a new Tensor object by copying another Tensor.
 Tensor::Tensor(const Tensor& other)
         : data_type_(other.data_type_),
           shape_(other.shape_),
+          device_(other.device_),
           allocator_(other.allocator_),
           buffer_(allocator_, allocator_->allocate(shape_.NumElements() * SizeOfType(data_type_))) {
-    std::memcpy(buffer_.data(), other.data(), buffer_.GetAllocatedBytes());
+    std::memcpy(buffer_.data(), other.data(), shape_.NumElements() * SizeOfType(data_type_));
 }
 
 // Get the data type of the tensor.
 DataType Tensor::data_type() const { return data_type_; }
+
+// Get the device type of the tensor.
+DeviceType Tensor::device_type() const { return device_; }
 
 // Get the shape of the tensor.
 const TensorShape& Tensor::shape() const { return shape_; }
@@ -51,6 +61,24 @@ void* Tensor::data() const { return buffer_.data(); }
 
 // Get the TensorBuffer object that holds the data of the tensor.
 const TensorBuffer& Tensor::buffer() const { return buffer_; }
+
+// Get the Allocator object according to the given device type.
+Allocator* Tensor::GetAllocator(DeviceType device) {
+    Allocator * allocator;
+    if (device == DeviceType::CpuDevice) {
+        allocator = new CPUAllocator();
+    }
+#if defined(__CUDA)
+    else if (device == DeviceType::GpuDevice) {
+        allocator = new GPUAllocator();
+    }
+#endif // __CUDA
+    else {
+        std::cerr << "Tensor device type " << device << " does not match requested type." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    return allocator;
+}
 
 
 // Overloaded operator<< for the Tensor class.
