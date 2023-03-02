@@ -2,18 +2,6 @@
 
 namespace container {
 
-// Specializations of DeviceTypeToEnum for supported devices.
-template <> const DeviceType DeivceTypeToEnum<DEVICE_CPU>::value = DeviceType::CpuDevice;
-template <> const DeviceType DeivceTypeToEnum<double>::value = DeviceType::GpuDevice;
-
-// Specializations of DataTypeToEnum for supported types.
-template <> const DataType DataTypeToEnum<int>::value = DataType::DT_INT;
-template <> const DataType DataTypeToEnum<float>::value = DataType::DT_FLOAT;
-template <> const DataType DataTypeToEnum<double>::value = DataType::DT_DOUBLE;
-template <> const DataType DataTypeToEnum<int64_t>::value = DataType::DT_INT64;
-template <> const DataType DataTypeToEnum<std::complex<float>>::value = DataType::DT_COMPLEX;
-template <> const DataType DataTypeToEnum<std::complex<double>>::value = DataType::DT_COMPLEX_DOUBLE;
-
 // Overloaded operator<< for the Tensor class.
 // Prints the data type of the enum type DataType.
 std::ostream& operator<<(std::ostream& os, const DataType& data_type) {

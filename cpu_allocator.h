@@ -1,5 +1,5 @@
-#ifndef MODULE_BASE_CONTAINER_CPU_ALLOCATOR_H
-#define MODULE_BASE_CONTAINER_CPU_ALLOCATOR_H
+#ifndef CONTAINER_CPU_ALLOCATOR_H
+#define CONTAINER_CPU_ALLOCATOR_H
 
 #include "allocator.h"
 
@@ -60,4 +60,4 @@ class CPUAllocator : public Allocator {
 
 } // namespace container
 
-#endif // MODULE_BASE_CONTAINER_CPU_ALLOCATOR_H
+#endif // CONTAINER_CPU_ALLOCATOR_H

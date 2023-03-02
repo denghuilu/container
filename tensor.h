@@ -1,5 +1,5 @@
-#ifndef MODULE_BASE_CONTAINER_TENSOR_H
-#define MODULE_BASE_CONTAINER_TENSOR_H
+#ifndef CONTAINER_TENSOR_H
+#define CONTAINER_TENSOR_H
 
 #include <complex>
 
@@ -7,6 +7,7 @@
 #include "tensor_types.h"
 #include "tensor_shape.h"
 #include "tensor_buffer.h"
+#include "kernels/memory_op.h"
 
 namespace container {
 
@@ -30,6 +31,17 @@ class Tensor {
     Tensor(DataType data_type, const TensorShape& shape);
 
     /**
+     * @brief Construct a new Tensor object with the given data type, shape and device type.
+     *
+     * The memory for the tensor is allocated according to the given device type.
+     *
+     * @param data_type The data type of the tensor.
+     * @param shape The shape of the tensor.
+     * @param device The data type of the tensor.
+     */
+    Tensor(DataType data_type, DeviceType device, const TensorShape& shape);
+
+    /**
      * @brief Constructor that creates a tensor with the given data pointer,
      * data type, device type and shape.
      *
@@ -43,17 +55,6 @@ class Tensor {
     Tensor(void * data, DataType data_type, DeviceType device, const TensorShape& shape);
 
     /**
-     * @brief Construct a new Tensor object with the given data type, shape and device type.
-     *
-     * The memory for the tensor is allocated according to the given device type.
-     *
-     * @param data_type The data type of the tensor.
-     * @param shape The shape of the tensor.
-     * @param device The data type of the tensor.
-     */
-    Tensor(DataType data_type, DeviceType device, const TensorShape& shape);
-
-    /**
      * @brief Construct a new Tensor object by copying another Tensor.
      *
      * This constructor performs a deep copy of the data buffer of the other tensor.
@@ -61,6 +62,26 @@ class Tensor {
      * @param other The tensor to copy from.
      */
     Tensor(const Tensor& other);
+
+    /**
+     *@brief Method to transform data from a given tensor object to the output tensor with a given device type
+     *
+     *@tparam DEVICE The device type of the returned tensor.
+     *
+     *@return Tensor A tensor object with data transformed to the output tensor
+     */
+    template <typename DEVICE>
+    Tensor to_device() const {
+        // Create output tensor on device
+        Tensor output(this->data_type_, DeviceTypeToEnum<DEVICE>::value, this->shape_);
+
+        // Copy data to device
+        TEMPLATE_2(this->data_type_, this->device_,
+                   container::op::synchronize_memory_op<FPTYPE_, DEVICE, DEVICE_>()(
+                           output.data<FPTYPE_>(), this->data<FPTYPE_>(), this->NumElements()));
+
+        return output;
+    }
 
     /**
      * @brief Get the data type of the tensor.
@@ -222,4 +243,4 @@ std::ostream& operator<<(std::ostream& os, const Tensor& tensor);
 
 } // namespace container
 
-#endif // MODULE_BASE_CONTAINER_TENSOR_H
+#endif // CONTAINER_TENSOR_H

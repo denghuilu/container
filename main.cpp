@@ -1,7 +1,6 @@
 #include <complex>
 #include <iostream>
 
-#include "gpu_allocator.h"
 #include "tensor.h"
 
 int main() {
@@ -20,7 +19,8 @@ int main() {
     }
 
     container::Tensor t3(t1_data, t1.data_type(), t1.device_type(), t1.shape());
-    container::Tensor t4 = t2;
+    container::Tensor t4 = t2.to_device<container::DEVICE_CPU>();
+    // container::Tensor t4 = t5.to_device<container::DEVICE_CPU>();
 
     std::cout << t1 << std::endl;
     std::cout << "NumElements:\t" << t1.NumElements() << std::endl;

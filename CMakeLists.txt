@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.18)
 
 project(container
     VERSION 0.0.0
@@ -62,3 +62,7 @@ if(CONTAINER_ENABLE_CUDA_TOOLKIT)
         set(CMAKE_CUDA_FLAGS ${CMAKE_CUDA_FLAGS} "-g -G")
     endif()
 endif()
+
+add_subdirectory(kernels)
+
+target_link_libraries(container PRIVATE device)

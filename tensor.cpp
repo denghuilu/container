@@ -42,6 +42,8 @@ Tensor::Tensor(const Tensor& other)
           allocator_(other.allocator_),
           buffer_(allocator_, allocator_->allocate(shape_.NumElements() * SizeOfType(data_type_))) {
     std::memcpy(buffer_.data(), other.data(), shape_.NumElements() * SizeOfType(data_type_));
+    // TEMPLATE_2(data_type_, device_, ops::memcpy<FPTYPE, Device>()(buffer_.data(), other.data(), shape_.NumElements()));
+    // TEMPLATE_4(data_type_, device_, ops::memcpy<FPTYPE, Device>()(buffer_.data(), other.data(), shape_.NumElements()));
 }
 
 // Get the data type of the tensor.

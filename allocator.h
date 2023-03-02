@@ -1,5 +1,5 @@
-#ifndef MODULE_BASE_CONTAINER_ALLOCATOR_H
-#define MODULE_BASE_CONTAINER_ALLOCATOR_H
+#ifndef CONTAINER_ALLOCATOR_H
+#define CONTAINER_ALLOCATOR_H
 
 #include <cstddef>
 
@@ -70,4 +70,4 @@ class Allocator {
 
 } // namespace ABACUS
 
-#endif // MODULE_BASE_CONTAINER_ALLOCATOR_H
+#endif // CONTAINER_ALLOCATOR_H

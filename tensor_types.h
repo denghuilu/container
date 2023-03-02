@@ -2,8 +2,8 @@
  * @file tensor_types.h
  * @brief This file contains the definition of the DataType enum class.
  */
-#ifndef MODULE_BASE_CONTAINER_TENSOR_TYPES_H_
-#define MODULE_BASE_CONTAINER_TENSOR_TYPES_H_
+#ifndef CONTAINER_TENSOR_TYPES_H_
+#define CONTAINER_TENSOR_TYPES_H_
 
 #include <complex>
 #include <iostream>
@@ -17,12 +17,12 @@ is identified by a unique value. The DT_INVALID value is reserved for invalid
 data types.
 */
 enum class DataType {
-    DT_INVALID = 0, /**< Invalid data type */
-    DT_FLOAT = 1, /**< Single-precision floating point */
-    DT_DOUBLE = 2, /**< Double-precision floating point */
-    DT_INT = 3, /**< 32-bit integer */
-    DT_INT64 = 4, /**< 64-bit integer */
-    DT_COMPLEX = 5, /**< 32-bit complex */
+    DT_INVALID = 0, ///< Invalid data type */
+    DT_FLOAT = 1, ///< Single-precision floating point */
+    DT_DOUBLE = 2, ///< Double-precision floating point */
+    DT_INT = 3, ///< 32-bit integer */
+    DT_INT64 = 4, ///< 64-bit integer */
+    DT_COMPLEX = 5, ///< 32-bit complex */
     DT_COMPLEX_DOUBLE = 6, /**< 64-bit complex */
 // ... other data types
 };
@@ -47,33 +47,69 @@ enum class DeviceType {
  * @brief Template struct for mapping a Device Type to its corresponding enum value.
  *
  * @param T The DataType to map to its enum value.
- *@return The enumeration value corresponding to the data type.
+ *
+ * @return The enumeration value corresponding to the data type.
  *  This method uses template specialization to map each supported data type to its
- *          corresponding enumeration value. If the template argument T is not a supported
+ *  corresponding enumeration value. If the template argument T is not a supported
  *  data type, this method will cause a compile-time error.
  *  Example usage:
  *      DataTypeToEnum<float>::value; // Returns DataType::DT_FLOAT
  */
 template <typename T>
-struct DeivceTypeToEnum {
-    static const DeviceType value;
+struct DeviceTypeToEnum {
+    static constexpr DeviceType value = {};
+};
+// Specializations of DeviceTypeToEnum for supported devices.
+template <>
+struct DeviceTypeToEnum<DEVICE_CPU> {
+    static constexpr DeviceType value = DeviceType::CpuDevice;
+};
+template <>
+struct DeviceTypeToEnum<DEVICE_GPU> {
+    static constexpr DeviceType value = DeviceType::GpuDevice;
 };
 
 /**
  * @brief Template struct for mapping a DataType to its corresponding enum value.
  *
  * @param T The DataType to map to its enum value.
- *@return The enumeration value corresponding to the data type.
+ *
+ * @return The enumeration value corresponding to the data type.
  *  This method uses template specialization to map each supported data type to its
- *          corresponding enumeration value. If the template argument T is not a supported
+ *  corresponding enumeration value. If the template argument T is not a supported
  *  data type, this method will cause a compile-time error.
  *  Example usage:
  *      DataTypeToEnum<float>::value; // Returns DataType::DT_FLOAT
  */
  template <typename T>
  struct DataTypeToEnum {
-     static const DataType value;
+     static constexpr DataType value = {};
  };
+// Specializations of DataTypeToEnum for supported types.
+template <>
+struct DataTypeToEnum<int> {
+    static constexpr DataType value = DataType::DT_INT;
+};
+template <>
+struct DataTypeToEnum<float> {
+    static constexpr DataType value = DataType::DT_FLOAT;
+};
+template <>
+struct DataTypeToEnum<double> {
+    static constexpr DataType value = DataType::DT_DOUBLE;
+};
+template <>
+struct DataTypeToEnum<int64_t> {
+    static constexpr DataType value = DataType::DT_INT64;
+};
+template <>
+struct DataTypeToEnum<std::complex<float>> {
+    static constexpr DataType value = DataType::DT_COMPLEX;
+};
+template <>
+struct DataTypeToEnum<std::complex<double>> {
+    static constexpr DataType value = DataType::DT_COMPLEX_DOUBLE;
+};
 
 /**
  * @brief Overloaded operator<< for the Tensor class.
@@ -99,5 +135,42 @@ std::ostream& operator<<(std::ostream& os, const DataType& data_type);
  */
 std::ostream& operator<<(std::ostream& os, const DeviceType& memory_type);
 
+// The macro TEMPLATE_1() expands to a switch statement conditioned on
+// TYPE_ENUM. Each case expands the STMTS after a typedef for FPTYPE.
+#define SINGLE_ARG(...) __VA_ARGS__
+
+#define CASE_ALL_2(TYPE, DEVICE, STMTS)           \
+  case (int(DataTypeToEnum<TYPE>::value) * 10 +   \
+        int(DeviceTypeToEnum<DEVICE>::value)): {  \
+    typedef TYPE FPTYPE_;                         \
+    typedef DEVICE DEVICE_;                       \
+    STMTS;                                        \
+    break;                                        \
+  }
+
+#define CASES_ALL_WITH_DEFAULT_2(TYPE_ENUM, DEVICE_ENUM, STMTS, DEFAULT) \
+  switch (int(TYPE_ENUM) * 10 + int(DEVICE_ENUM)) {                      \
+    CASE_ALL_2(float, DEVICE_CPU, SINGLE_ARG(STMTS))                     \
+    CASE_ALL_2(float, DEVICE_GPU, SINGLE_ARG(STMTS))                     \
+    CASE_ALL_2(double, DEVICE_CPU, SINGLE_ARG(STMTS))                    \
+    CASE_ALL_2(double, DEVICE_GPU, SINGLE_ARG(STMTS))                    \
+    CASE_ALL_2(int, DEVICE_CPU, SINGLE_ARG(STMTS))                       \
+    CASE_ALL_2(int, DEVICE_GPU, SINGLE_ARG(STMTS))                       \
+    CASE_ALL_2(int64_t, DEVICE_CPU, SINGLE_ARG(STMTS))                   \
+    CASE_ALL_2(int64_t, DEVICE_GPU, SINGLE_ARG(STMTS))                   \
+    CASE_ALL_2(std::complex<float>, DEVICE_CPU, SINGLE_ARG(STMTS))       \
+    CASE_ALL_2(std::complex<float>, DEVICE_GPU, SINGLE_ARG(STMTS))       \
+    CASE_ALL_2(std::complex<double>, DEVICE_CPU, SINGLE_ARG(STMTS))      \
+    CASE_ALL_2(std::complex<double>, DEVICE_GPU, SINGLE_ARG(STMTS))      \
+    default:                                                             \
+      DEFAULT;                                                           \
+      break;                                                             \
+  }
+
+// TODO: add a log solution to container.
+#define TEMPLATE_2(TYPE_ENUM, DEVICE_ENUM, ...)                    \
+  CASES_ALL_WITH_DEFAULT_2(TYPE_ENUM, DEVICE_ENUM, (__VA_ARGS__),  \
+                           std::cerr << "Unexpected type: " << TYPE_ENUM; exit(EXIT_FAILURE));
+
 } // namespace container
-#endif // MODULE_BASE_CONTAINER_TENSOR_TYPES_H_
+#endif // CONTAINER_TENSOR_TYPES_H_

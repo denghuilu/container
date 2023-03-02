@@ -1,5 +1,5 @@
-#ifndef MODULE_BASE_CONTAINER_TENSOR_BUFFER_H_
-#define MODULE_BASE_CONTAINER_TENSOR_BUFFER_H_
+#ifndef CONTAINER_TENSOR_BUFFER_H_
+#define CONTAINER_TENSOR_BUFFER_H_
 
 #include <cstddef>
 
@@ -100,4 +100,4 @@ namespace container {
 
 }  // namespace container
 
-#endif  // MODULE_BASE_CONTAINER_TENSOR_BUFFER_H_
+#endif  // CONTAINER_TENSOR_BUFFER_H_

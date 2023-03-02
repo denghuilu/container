@@ -1,5 +1,5 @@
-#ifndef MODULE_BASE_CONTAINER_TENSOR_SHAPE_H_
-#define MODULE_BASE_CONTAINER_TENSOR_SHAPE_H_
+#ifndef CONTAINER_TENSOR_SHAPE_H_
+#define CONTAINER_TENSOR_SHAPE_H_
 
 #include <vector>
 #include <iostream>
@@ -108,4 +108,4 @@ std::ostream& operator<<(std::ostream& os, const TensorShape& shape);
 
 } // container
 
-#endif  // MODULE_BASE_CONTAINER_TENSOR_SHAPE_H_
+#endif  // CONTAINER_TENSOR_SHAPE_H_
