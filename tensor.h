@@ -64,26 +64,6 @@ class Tensor {
     Tensor(const Tensor& other);
 
     /**
-     *@brief Method to transform data from a given tensor object to the output tensor with a given device type
-     *
-     *@tparam DEVICE The device type of the returned tensor.
-     *
-     *@return Tensor A tensor object with data transformed to the output tensor
-     */
-    template <typename DEVICE>
-    Tensor to_device() const {
-        // Create output tensor on device
-        Tensor output(this->data_type_, DeviceTypeToEnum<DEVICE>::value, this->shape_);
-
-        // Copy data to device
-        TEMPLATE_2(this->data_type_, this->device_,
-                   container::op::synchronize_memory_op<FPTYPE_, DEVICE, DEVICE_>()(
-                           output.data<FPTYPE_>(), this->data<FPTYPE_>(), this->NumElements()));
-
-        return output;
-    }
-
-    /**
      * @brief Get the data type of the tensor.
      *
      * @return The data type of the tensor.
@@ -188,6 +168,26 @@ class Tensor {
                 std::cerr << "Unsupported data type!" << std::endl;
                 exit(EXIT_FAILURE);
         }
+    }
+
+    /**
+     *@brief Method to transform data from a given tensor object to the output tensor with a given device type
+     *
+     *@tparam DEVICE The device type of the returned tensor.
+     *
+     *@return Tensor A tensor object with data transformed to the output tensor
+     */
+    template <typename DEVICE>
+    Tensor to_device() const {
+        // Create output tensor on device
+        Tensor output(this->data_type_, DeviceTypeToEnum<DEVICE>::value, this->shape_);
+
+        // Copy data to device
+        TEMPLATE_2(this->data_type_, this->device_,
+                   container::op::synchronize_memory_op<FPTYPE_, DEVICE, DEVICE_>()(
+                           output.data<FPTYPE_>(), this->data<FPTYPE_>(), this->NumElements()));
+
+        return output;
     }
 
 private:
