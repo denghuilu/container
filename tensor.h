@@ -137,7 +137,7 @@ class Tensor {
     /**
      * @brief Returns the size of a single element for a given data type.
      *
-     * @param dtype The data type.
+     * @param data_type The data type.
      *
      * @return The size of a single element.
      *
@@ -152,8 +152,8 @@ class Tensor {
      * DT_COMPLEX: 8 bytes (2 floats)
      * DT_COMPLEX_DOUBLE: 16 bytes (2 doubles)
      */
-    static size_t SizeOfType(DataType dtype) {
-        switch (dtype) {
+    static size_t SizeOfType(DataType data_type) {
+        switch (data_type) {
             case DataType::DT_FLOAT:
                 return sizeof(float);
             case DataType::DT_INT:
@@ -171,21 +171,42 @@ class Tensor {
     }
 
     /**
-     *@brief Method to transform data from a given tensor object to the output tensor with a given device type
+     * @brief Method to transform data from a given tensor object to the output tensor with a given device type
      *
-     *@tparam DEVICE The device type of the returned tensor.
+     * @tparam DEVICE The device type of the returned tensor.
      *
-     *@return Tensor A tensor object with data transformed to the output tensor
+     * @return Tensor A tensor object with data transformed to the output tensor
      */
     template <typename DEVICE>
     Tensor to_device() const {
         // Create output tensor on device
         Tensor output(this->data_type_, DeviceTypeToEnum<DEVICE>::value, this->shape_);
 
-        // Copy data to device
-        TEMPLATE_2(this->data_type_, this->device_,
-                   container::op::synchronize_memory_op<FPTYPE_, DEVICE, DEVICE_>()(
-                           output.data<FPTYPE_>(), this->data<FPTYPE_>(), this->NumElements()));
+        // Copy data to a specified device
+        TEMPLATE_ALL_2(this->data_type_, this->device_,
+                   container::op::synchronize_memory_op<T_, DEVICE, DEVICE_>()(
+                           output.data<T_>(), this->data<T_>(), this->NumElements()))
+
+        return output;
+    }
+
+    /**
+     * @brief Method to transform data from a given tensor object to the output tensor with a given data type
+     *
+     * @tparam T The data type of the returned tensor.
+     *
+     * @return Tensor A tensor object with data transformed to the output tensor
+     */
+    template <typename T>
+    Tensor cast() const {
+        // Create output tensor on device
+        Tensor output(DataTypeToEnum<T>::value, this->device_, this->shape_);
+
+        // TODO: error handle of cast memory
+        // Copy data to a specified device
+        TEMPLATE_CZ_2(this->data_type_, this->device_,
+                   container::op::cast_memory_op<T, T_, DEVICE_, DEVICE_>()(
+                           output.data<T>(), this->data<T_>(), this->NumElements()))
 
         return output;
     }

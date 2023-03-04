@@ -6,7 +6,10 @@
 int main() {
 
     container::Tensor t1(container::DataType::DT_FLOAT, container::TensorShape({2, 3, 4}));
-    container::Tensor t2(container::DataType::DT_COMPLEX_DOUBLE, container::TensorShape({3, 4}));
+    container::Tensor t2(
+            container::DataTypeToEnum<std::complex<double>>::value,
+            container::DeviceTypeToEnum<container::DEVICE_CPU>::value,
+            container::TensorShape({3, 4}));
 
     auto * t1_data = t1.data<float>();
     auto * t2_data = t2.data<std::complex<double>>();
@@ -15,12 +18,12 @@ int main() {
         t1_data[ii] = 1.0;
     }
     for (int ii = 0; ii < t2.NumElements(); ii++) {
-        t2_data[ii] = {1.0, 0.0};
+        t2_data[ii] = {18.2222, -3232.10889};
     }
 
     container::Tensor t3(t1_data, t1.data_type(), t1.device_type(), t1.shape());
-    container::Tensor t4 = t2.to_device<container::DEVICE_CPU>();
-    // container::Tensor t4 = t5.to_device<container::DEVICE_CPU>();
+    container::Tensor t4 = t2.to_device<container::DEVICE_GPU>();
+    container::Tensor t5 = t4.cast<std::complex<float>>().to_device<container::DEVICE_CPU>();
 
     std::cout << t1 << std::endl;
     std::cout << "NumElements:\t" << t1.NumElements() << std::endl;
@@ -52,11 +55,16 @@ int main() {
     std::cout << "DataType:\t" << t4.data_type() << std::endl;
     std::cout << "MemoryType:\t" << t4.device_type() << std::endl;
     std::cout << "Owns memory? :\t" << t4.buffer().OwnsMemory() << std::endl;
+    std::cout << std::endl;
 
+    std::cout << t5 << std::endl;
+    std::cout << "NumElements:\t" << t5.NumElements() << std::endl;
+    std::cout << "TensorShape:\t" << t5.shape() << std::endl;
+    std::cout << "DataType:\t" << t5.data_type() << std::endl;
+    std::cout << "MemoryType:\t" << t5.device_type() << std::endl;
+    std::cout << "Owns memory? :\t" << t5.buffer().OwnsMemory() << std::endl;
 
     // TODO:
     // Add some math operations,
-    // GPU memory
-    // Type check
     // Unit test
 }

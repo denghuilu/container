@@ -34,9 +34,7 @@ struct synchronize_memory_op<FPTYPE, container::DEVICE_CPU, container::DEVICE_CP
 
 template <typename FPTYPE_out, typename FPTYPE_in>
 struct cast_memory_op<FPTYPE_out, FPTYPE_in, container::DEVICE_CPU, container::DEVICE_CPU> {
-    void operator()(const container::DEVICE_CPU* dev_out,
-                    const container::DEVICE_CPU* dev_in,
-                    FPTYPE_out* arr_out,
+    void operator()(FPTYPE_out* arr_out,
                     const FPTYPE_in* arr_in,
                     const size_t size) {
         for (int ii = 0; ii < size; ii++) {

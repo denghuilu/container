@@ -136,13 +136,13 @@ std::ostream& operator<<(std::ostream& os, const DataType& data_type);
 std::ostream& operator<<(std::ostream& os, const DeviceType& memory_type);
 
 // The macro TEMPLATE_1() expands to a switch statement conditioned on
-// TYPE_ENUM. Each case expands the STMTS after a typedef for FPTYPE.
+// TYPE_ENUM. Each case expands the STMTS after a typedef for T.
 #define SINGLE_ARG(...) __VA_ARGS__
 
-#define CASE_ALL_2(TYPE, DEVICE, STMTS)           \
+#define CASE_2(TYPE, DEVICE, STMTS)               \
   case (int(DataTypeToEnum<TYPE>::value) * 10 +   \
         int(DeviceTypeToEnum<DEVICE>::value)): {  \
-    typedef TYPE FPTYPE_;                         \
+    typedef TYPE T_;                              \
     typedef DEVICE DEVICE_;                       \
     STMTS;                                        \
     break;                                        \
@@ -150,26 +150,41 @@ std::ostream& operator<<(std::ostream& os, const DeviceType& memory_type);
 
 #define CASES_ALL_WITH_DEFAULT_2(TYPE_ENUM, DEVICE_ENUM, STMTS, DEFAULT) \
   switch (int(TYPE_ENUM) * 10 + int(DEVICE_ENUM)) {                      \
-    CASE_ALL_2(float, DEVICE_CPU, SINGLE_ARG(STMTS))                     \
-    CASE_ALL_2(float, DEVICE_GPU, SINGLE_ARG(STMTS))                     \
-    CASE_ALL_2(double, DEVICE_CPU, SINGLE_ARG(STMTS))                    \
-    CASE_ALL_2(double, DEVICE_GPU, SINGLE_ARG(STMTS))                    \
-    CASE_ALL_2(int, DEVICE_CPU, SINGLE_ARG(STMTS))                       \
-    CASE_ALL_2(int, DEVICE_GPU, SINGLE_ARG(STMTS))                       \
-    CASE_ALL_2(int64_t, DEVICE_CPU, SINGLE_ARG(STMTS))                   \
-    CASE_ALL_2(int64_t, DEVICE_GPU, SINGLE_ARG(STMTS))                   \
-    CASE_ALL_2(std::complex<float>, DEVICE_CPU, SINGLE_ARG(STMTS))       \
-    CASE_ALL_2(std::complex<float>, DEVICE_GPU, SINGLE_ARG(STMTS))       \
-    CASE_ALL_2(std::complex<double>, DEVICE_CPU, SINGLE_ARG(STMTS))      \
-    CASE_ALL_2(std::complex<double>, DEVICE_GPU, SINGLE_ARG(STMTS))      \
+    CASE_2(float, DEVICE_CPU, SINGLE_ARG(STMTS))                         \
+    CASE_2(float, DEVICE_GPU, SINGLE_ARG(STMTS))                         \
+    CASE_2(double, DEVICE_CPU, SINGLE_ARG(STMTS))                        \
+    CASE_2(double, DEVICE_GPU, SINGLE_ARG(STMTS))                        \
+    CASE_2(int, DEVICE_CPU, SINGLE_ARG(STMTS))                           \
+    CASE_2(int, DEVICE_GPU, SINGLE_ARG(STMTS))                           \
+    CASE_2(int64_t, DEVICE_CPU, SINGLE_ARG(STMTS))                       \
+    CASE_2(int64_t, DEVICE_GPU, SINGLE_ARG(STMTS))                       \
+    CASE_2(std::complex<float>, DEVICE_CPU, SINGLE_ARG(STMTS))           \
+    CASE_2(std::complex<float>, DEVICE_GPU, SINGLE_ARG(STMTS))           \
+    CASE_2(std::complex<double>, DEVICE_CPU, SINGLE_ARG(STMTS))          \
+    CASE_2(std::complex<double>, DEVICE_GPU, SINGLE_ARG(STMTS))          \
+    default:                                                             \
+      DEFAULT;                                                           \
+      break;                                                             \
+  }
+
+#define CASES_CZ_WITH_DEFAULT_2(TYPE_ENUM, DEVICE_ENUM, STMTS, DEFAULT)  \
+  switch (int(TYPE_ENUM) * 10 + int(DEVICE_ENUM)) {                      \
+    CASE_2(std::complex<float>, DEVICE_CPU, SINGLE_ARG(STMTS))           \
+    CASE_2(std::complex<float>, DEVICE_GPU, SINGLE_ARG(STMTS))           \
+    CASE_2(std::complex<double>, DEVICE_CPU, SINGLE_ARG(STMTS))          \
+    CASE_2(std::complex<double>, DEVICE_GPU, SINGLE_ARG(STMTS))          \
     default:                                                             \
       DEFAULT;                                                           \
       break;                                                             \
   }
 
 // TODO: add a log solution to container.
-#define TEMPLATE_2(TYPE_ENUM, DEVICE_ENUM, ...)                    \
-  CASES_ALL_WITH_DEFAULT_2(TYPE_ENUM, DEVICE_ENUM, (__VA_ARGS__),  \
+#define TEMPLATE_ALL_2(TYPE_ENUM, DEVICE_ENUM, ...)                      \
+  CASES_ALL_WITH_DEFAULT_2(TYPE_ENUM, DEVICE_ENUM, (__VA_ARGS__),        \
+                           std::cerr << "Unexpected type: " << TYPE_ENUM; exit(EXIT_FAILURE));
+
+#define TEMPLATE_CZ_2(TYPE_ENUM, DEVICE_ENUM, ...)                       \
+  CASES_CZ_WITH_DEFAULT_2(TYPE_ENUM, DEVICE_ENUM, (__VA_ARGS__),         \
                            std::cerr << "Unexpected type: " << TYPE_ENUM; exit(EXIT_FAILURE));
 
 } // namespace container

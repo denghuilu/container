@@ -98,8 +98,6 @@ struct cast_memory_op {
      * @param size The size of the array.
      */
     void operator()(
-        const Device_out* dev_out,
-        const Device_in* dev_in,
         FPTYPE_out* arr_out,
         const FPTYPE_in* arr_in,
         const size_t size);

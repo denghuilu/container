@@ -87,7 +87,19 @@ Allocator* Tensor::GetAllocator(DeviceType device) {
 std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
     const int64_t num_elements = tensor.NumElements();
     const DataType data_type = tensor.data_type();
+    const DeviceType device_type = tensor.device_type();
     const TensorShape& shape = tensor.shape();
+
+    // Copy the data form device to host for output
+    auto * data_ = tensor.data();
+    if (device_type != DeviceType::CpuDevice) {
+        data_ = malloc(num_elements * Tensor::SizeOfType(data_type));
+        // Copy data to a specified device
+        TEMPLATE_ALL_2(data_type, device_type,
+                       container::op::synchronize_memory_op<T_, DEVICE_CPU, DEVICE_>()(
+                               reinterpret_cast<T_ *>(data_), tensor.data<T_>(), num_elements))
+    }
+
     os << "Tensor(";
     os << "shape=(";
     for (int i = 0; i < shape.ndims(); ++i) {
@@ -96,11 +108,12 @@ std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
             os << ",";
         }
     }
-    os << "), data_type=" << tensor.data_type();
+    os << "), data_type=" << data_type;
+    os << "), device_type=" << device_type;
     os << ", buffer=[";
     switch (data_type) {
         case DataType::DT_FLOAT: {
-            const auto* data = static_cast<const float*>(tensor.data());
+            const auto* data = static_cast<const float*>(data_);
             for (int64_t i = 0; i < num_elements; ++i) {
                 os << data[i];
                 if (i < num_elements - 1) {
@@ -110,7 +123,7 @@ std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
             break;
         }
         case DataType::DT_DOUBLE: {
-            const auto* data = static_cast<const double*>(tensor.data());
+            const auto* data = static_cast<const double*>(data_);
             for (int64_t i = 0; i < num_elements; ++i) {
                 os << data[i];
                 if (i < num_elements - 1) {
@@ -120,7 +133,7 @@ std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
             break;
         }
         case DataType::DT_INT: {
-            const auto* data = static_cast<const int*>(tensor.data());
+            const auto* data = static_cast<const int*>(data_);
             for (int64_t i = 0; i < num_elements; ++i) {
                 os << data[i];
                 if (i < num_elements - 1) {
@@ -130,7 +143,7 @@ std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
             break;
         }
         case DataType::DT_INT64: {
-            const auto* data = static_cast<const int64_t*>(tensor.data());
+            const auto* data = static_cast<const int64_t*>(data_);
             for (int64_t i = 0; i < num_elements; ++i) {
                 os << data[i];
                 if (i < num_elements - 1) {
@@ -140,7 +153,7 @@ std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
             break;
         }
         case DataType::DT_COMPLEX: {
-            const auto* data = static_cast<const std::complex<float>*>(tensor.data());
+            const auto* data = static_cast<const std::complex<float>*>(data_);
             for (int64_t i = 0; i < num_elements; ++i) {
                 os << "{" << data[i].real() << ", " << data[i].imag() << "}";
                 if (i < num_elements - 1) {
@@ -150,7 +163,7 @@ std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
             break;
         }
         case DataType::DT_COMPLEX_DOUBLE: {
-            const auto* data = static_cast<const std::complex<double>*>(tensor.data());
+            const auto* data = static_cast<const std::complex<double>*>(data_);
             for (int64_t i = 0; i < num_elements; ++i) {
                 os << "{" << data[i].real() << ", " << data[i].imag() << "}";
                 if (i < num_elements - 1) {
@@ -164,6 +177,11 @@ std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
             break;
     }
     os << "])";
+
+    // delete the temporary data
+    if (device_type != DeviceType::CpuDevice) {
+        free(data_);
+    }
     return os;
 }
 
