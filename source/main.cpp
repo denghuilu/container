@@ -5,7 +5,7 @@
 
 int main() {
 
-    container::Tensor t1(container::DataType::DT_FLOAT, container::TensorShape({2, 3, 4}));
+    container::Tensor t1(container::DataType::DT_FLOAT, {2, 3, 4});
     container::Tensor t2(
             container::DataTypeToEnum<std::complex<double>>::value,
             container::DeviceTypeToEnum<container::DEVICE_CPU>::value,
@@ -24,6 +24,7 @@ int main() {
     container::Tensor t3(t1_data, t1.data_type(), t1.device_type(), t1.shape());
     container::Tensor t4 = t2.to_device<container::DEVICE_GPU>();
     container::Tensor t5 = t4.cast<std::complex<float>>().to_device<container::DEVICE_CPU>();
+    t5.reshape({-1, 4});
 
     std::cout << t1 << std::endl;
     std::cout << "NumElements:\t" << t1.NumElements() << std::endl;
@@ -41,6 +42,7 @@ int main() {
     std::cout << "Owns memory? :\t" << t2.buffer().OwnsMemory() << std::endl;
     std::cout << std::endl;
 
+    t3.zero();
     std::cout << t3 << std::endl;
     std::cout << "NumElements:\t" << t3.NumElements() << std::endl;
     std::cout << "TensorShape:\t" << t3.shape() << std::endl;
@@ -57,6 +59,7 @@ int main() {
     std::cout << "Owns memory? :\t" << t4.buffer().OwnsMemory() << std::endl;
     std::cout << std::endl;
 
+    t5.zero();
     std::cout << t5 << std::endl;
     std::cout << "NumElements:\t" << t5.NumElements() << std::endl;
     std::cout << "TensorShape:\t" << t5.shape() << std::endl;

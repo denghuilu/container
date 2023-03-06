@@ -211,7 +211,19 @@ class Tensor {
         return output;
     }
 
+    /**
+     * @brief Set all elements in current tensor object to zero.
+     */
     void zero();
+
+    /**
+     * @brief Set all elements in current tensor object to zero.
+     *
+     * @param shape The new shape of the tensor.
+     *
+     * @note There can be one -1 dimension in the input shape, indicates the auto reshape.
+     */
+    void reshape(TensorShape shape);
 
 private:
 

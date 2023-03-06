@@ -1,6 +1,6 @@
 #include "lapack_op.h"
 
-#include <assert.h>
+#include <cassert>
 #include <algorithm>
 
 namespace container {

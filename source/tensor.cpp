@@ -82,9 +82,46 @@ Allocator* Tensor::GetAllocator(DeviceType device) {
     return allocator;
 }
 
+// Set the tensor to zero
 void Tensor::zero() {
     TEMPLATE_ALL_2(this->data_type_, this->device_,
             op::set_memory_op<T_, DEVICE_>()(this->data<T_>(), 0, this->NumElements()))
+}
+
+// Reshape the current tensor
+void Tensor::reshape(TensorShape shape) {
+    // check the -1 dimension
+    int num = 1, auto_shape = 0, dim_count = -1, dim_idx = -1;
+
+    for (int dim : shape.dims()) {
+        dim_count++;
+        if (dim < 1 && dim != -1) {
+            throw std::invalid_argument("Invalid shape, dim of tensor must >= 1 or equal to -1(auto shape).");
+        }
+        if (dim == -1) {
+            auto_shape++;
+            dim_idx = dim_count;
+        }
+        num *= dim;
+    }
+    // more than one -1 dimension.
+    if (auto_shape > 1) {
+        throw std::invalid_argument("Invalid shape, there can be only one -1 dim in TensorShape object.");
+    }
+    // auto reshape
+    if (auto_shape == 1) {
+        int dim_ = static_cast<int>(this->NumElements()) / (-num);
+        if (dim_ < 1 || -dim_ * num != this->NumElements()) {
+            throw std::invalid_argument("Invalid shape, total number of elements does not match!");
+        }
+        shape.set_dim_size(dim_idx, dim_);
+    }
+    else {
+        if (num != this->NumElements()) {
+            throw std::invalid_argument("Invalid shape, total number of elements does not match!");
+        }
+    }
+    this->shape_ = shape;
 }
 
 // Overloaded operator<< for the Tensor class.
