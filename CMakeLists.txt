@@ -32,7 +32,7 @@ if(ENABLE_CUDA_TOOLKIT)
         75 # T4
         80 # A100
     )
-    target_link_libraries(container PRIVATE
+    target_link_libraries(container
         CUDA::cufft
         CUDA::cudart
         CUDA::cublas
@@ -90,9 +90,7 @@ endif()
 
 add_subdirectory(source)
 
-target_link_libraries(
-    container
-    PRIVATE
-    source
-    device
-)
+target_link_libraries(container ${math_libs})
+
+# link the source files
+target_link_libraries(container source device)
