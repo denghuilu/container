@@ -4,21 +4,21 @@ namespace container {
 namespace op {
 
 //// CPU specialization of actual computation.
-//template <typename FPTYPE>
-//struct zdot_real_op<FPTYPE, DEVICE_CPU> {
-//    FPTYPE operator() (
+//template <typename T>
+//struct zdot_real_op<T, DEVICE_CPU> {
+//    T operator() (
 //            const DEVICE_CPU* d,
 //            const int& dim,
-//            const std::complex<FPTYPE>* psi_L,
-//            const std::complex<FPTYPE>* psi_R,
+//            const std::complex<T>* psi_L,
+//            const std::complex<T>* psi_R,
 //            const bool reduce)
 //    {
 //        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 //        // qianrui modify 2021-3-14
 //        // Note that  ddot_(2*dim,a,1,b,1) = REAL( zdotc_(dim,a,1,b,1) )
-//        const FPTYPE* pL = reinterpret_cast<const FPTYPE*>(psi_L);
-//        const FPTYPE* pR = reinterpret_cast<const FPTYPE*>(psi_R);
-//        FPTYPE result = BlasConnector::dot(2 * dim, pL, 1, pR, 1);
+//        const T* pL = reinterpret_cast<const T*>(psi_L);
+//        const T* pR = reinterpret_cast<const T*>(psi_R);
+//        T result = BlasConnector::dot(2 * dim, pL, 1, pR, 1);
 //        if (reduce) {
 //            Parallel_Reduce::reduce_double_pool(result);
 //        }
@@ -26,55 +26,55 @@ namespace op {
 //    }
 //};
 
-template <typename FPTYPE>
-struct scal_op<FPTYPE, DEVICE_CPU> {
+template <typename T>
+struct scal_op<T, DEVICE_CPU> {
     void operator()(
             const int &N,
-            const std::complex<FPTYPE> *alpha,
-            std::complex<FPTYPE> *X,
+            const std::complex<T> *alpha,
+            std::complex<T> *X,
             const int &incx)
     {
         BlasConnector::scal(N, *alpha, X, incx);
     }
 };
 
-template <typename FPTYPE>
-struct gemv_op<FPTYPE, DEVICE_CPU> {
+template <typename T>
+struct gemv_op<T, DEVICE_CPU> {
     void operator()(
             const DEVICE_CPU *d,
             const char &trans,
             const int &m,
             const int &n,
-            const std::complex<FPTYPE> *alpha,
-            const std::complex<FPTYPE> *A,
+            const std::complex<T> *alpha,
+            const std::complex<T> *A,
             const int &lda,
-            const std::complex<FPTYPE> *X,
+            const std::complex<T> *X,
             const int &incx,
-            const std::complex<FPTYPE> *beta,
-            std::complex<FPTYPE> *Y,
+            const std::complex<T> *beta,
+            std::complex<T> *Y,
             const int &incy)
     {
         BlasConnector::gemv(trans, m, n, *alpha, A, lda, X, incx, *beta, Y, incy);
     }
 };
 
-template <typename FPTYPE>
-struct axpy_op<FPTYPE, DEVICE_CPU> {
+template <typename T>
+struct axpy_op<T, DEVICE_CPU> {
     void operator()(
             const DEVICE_CPU * /*ctx*/,
             const int &dim,
-            const std::complex<FPTYPE> *alpha,
-            const std::complex<FPTYPE> *X,
+            const std::complex<T> *alpha,
+            const std::complex<T> *X,
             const int &incX,
-            std::complex<FPTYPE> *Y,
+            std::complex<T> *Y,
             const int &incY)
     {
         BlasConnector::axpy(dim, *alpha, X, incX, Y, incY);
     }
 };
 
-template <typename FPTYPE>
-struct gemm_op<FPTYPE, DEVICE_CPU> {
+template <typename T>
+struct gemm_op<T, DEVICE_CPU> {
     void operator()(
             const DEVICE_CPU * /*ctx*/,
             const char &transa,
@@ -82,13 +82,13 @@ struct gemm_op<FPTYPE, DEVICE_CPU> {
             const int &m,
             const int &n,
             const int &k,
-            const std::complex<FPTYPE> *alpha,
-            const std::complex<FPTYPE> *a,
+            const std::complex<T> *alpha,
+            const std::complex<T> *a,
             const int &lda,
-            const std::complex<FPTYPE> *b,
+            const std::complex<T> *b,
             const int &ldb,
-            const std::complex<FPTYPE> *beta,
-            std::complex<FPTYPE> *c,
+            const std::complex<T> *beta,
+            std::complex<T> *c,
             const int &ldc)
     {
         BlasConnector::gemm(transb, transa, n, m, k, *alpha, b, ldb, a, lda, *beta, c, ldc);

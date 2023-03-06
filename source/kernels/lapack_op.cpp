@@ -6,30 +6,30 @@
 namespace container {
 namespace op {
 
-template <typename FPTYPE>
-struct dngvd_op<FPTYPE, DEVICE_CPU> {
+template <typename T>
+struct dngvd_op<T, DEVICE_CPU> {
     void operator()(
             const int nstart,
             const int ldh,
-            const std::complex<FPTYPE> *hcc,
-            const std::complex<FPTYPE> *scc,
-            FPTYPE *eigenvalue,
-            std::complex<FPTYPE> *vcc)
+            const std::complex<T> *hcc,
+            const std::complex<T> *scc,
+            T *eigenvalue,
+            std::complex<T> *vcc)
     {
         for (int i = 0; i < nstart * ldh; i++) {
             vcc[i] = hcc[i];
         }
         int info = 0;
         int lwork = 2 * nstart + nstart * nstart;
-        // std::complex<FPTYPE> *work = new std::complex<FPTYPE>[lwork];
+        // std::complex<T> *work = new std::complex<T>[lwork];
         // ModuleBase::GlobalFunc::ZEROS(work, lwork);
-        Tensor work(DataTypeToEnum<std::complex<FPTYPE>>::value, DeviceType::CpuDevice, {lwork});
+        Tensor work(DataTypeToEnum<std::complex<T>>::value, DeviceType::CpuDevice, {lwork});
         work.zero();
 
         int lrwork = 1 + 5 * nstart + 2 * nstart * nstart;
-        // FPTYPE *rwork = new FPTYPE[lrwork];
+        // T *rwork = new T[lrwork];
         // ModuleBase::GlobalFunc::ZEROS(rwork, lrwork);
-        Tensor rwork(DataTypeToEnum<FPTYPE>::value, DeviceType::CpuDevice, {lrwork});
+        Tensor rwork(DataTypeToEnum<T>::value, DeviceType::CpuDevice, {lrwork});
         rwork.zero();
 
         int liwork = 3 + 5 * nstart;
@@ -40,24 +40,24 @@ struct dngvd_op<FPTYPE, DEVICE_CPU> {
         //===========================
         // calculate all eigenvalues
         //===========================
-        LapackConnector::xhegvd(1, 'V', 'U', nstart, vcc, ldh, scc, ldh, eigenvalue, work.data<std::complex<FPTYPE>>(), lwork, rwork.data<FPTYPE>(), lrwork, iwork.data<int>(), liwork, info);
+        LapackConnector::xhegvd(1, 'V', 'U', nstart, vcc, ldh, scc, ldh, eigenvalue, work.data<std::complex<T>>(), lwork, rwork.data<T>(), lrwork, iwork.data<int>(), liwork, info);
 
         assert(0 == info);
     }
 };
 
 
-template <typename FPTYPE>
-struct dnevx_op<FPTYPE, DEVICE_CPU> {
+template <typename T>
+struct dnevx_op<T, DEVICE_CPU> {
     void operator()(
             const int nstart,
             const int ldh,
-            const std::complex<FPTYPE>* hcc, // hcc
+            const std::complex<T>* hcc, // hcc
             const int nbands, // nbands
-            FPTYPE* eigenvalue, // eigenvalue
-            std::complex<FPTYPE>* vcc) // vcc
+            T* eigenvalue, // eigenvalue
+            std::complex<T>* vcc) // vcc
     {
-        std::complex<FPTYPE>* aux = new std::complex<FPTYPE>[nstart * ldh];
+        std::complex<T>* aux = new std::complex<T>[nstart * ldh];
         for (int ii = 0; ii < nstart * ldh; ii++) {
             aux[ii] = hcc[ii];
         }
@@ -74,7 +74,7 @@ struct dnevx_op<FPTYPE, DEVICE_CPU> {
         } else {
             lwork = (nb + 1) * nstart;
         }
-        // FPTYPE *rwork = new FPTYPE[7 * nstart];
+        // T *rwork = new T[7 * nstart];
         // int *iwork = new int[5 * nstart];
         // int *ifail = new int[nstart];
         // ModuleBase::GlobalFunc::ZEROS(rwork, 7 * nstart);
@@ -82,11 +82,11 @@ struct dnevx_op<FPTYPE, DEVICE_CPU> {
         // ModuleBase::GlobalFunc::ZEROS(ifail, nstart);
         // important part:
         // In davidson, the size of work is different from dnevx_op in diagH_subspace.
-        // std::complex<FPTYPE> *work = new std::complex<FPTYPE>[2 * lwork];
-        Tensor rwork(DataTypeToEnum<FPTYPE>::value, DeviceType::CpuDevice, {7 * nstart});
+        // std::complex<T> *work = new std::complex<T>[2 * lwork];
+        Tensor rwork(DataTypeToEnum<T>::value, DeviceType::CpuDevice, {7 * nstart});
         Tensor iwork(DataType::DT_INT, DeviceType::CpuDevice, {5 * nstart});
         Tensor ifail(DataType::DT_INT, DeviceType::CpuDevice, {nstart});
-        Tensor work(DataTypeToEnum<std::complex<FPTYPE>>::value, DeviceType::CpuDevice, {2 * lwork});
+        Tensor work(DataTypeToEnum<std::complex<T>>::value, DeviceType::CpuDevice, {2 * lwork});
         // ModuleBase::GlobalFunc::ZEROS(work, lwork); // qianrui change it, only first lwork numbers are used in zhegvx
         rwork.zero();
         iwork.zero();
@@ -115,9 +115,9 @@ struct dnevx_op<FPTYPE, DEVICE_CPU> {
                 eigenvalue, // W store eigenvalues
                 vcc, // store eigenvector
                 ldh, // LDZ: The leading dimension of the array Z.
-                work.data<std::complex<FPTYPE>>(),
+                work.data<std::complex<T>>(),
                 lwork,
-                rwork.data<FPTYPE>(),
+                rwork.data<T>(),
                 iwork.data<int>(),
                 ifail.data<int>(),
                 info);

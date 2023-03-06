@@ -12,10 +12,10 @@ namespace op {
 
 /**
  * @brief A functor to resize memory allocation.
- * @tparam FPTYPE Floating-point type of the allocated memory.
+ * @tparam T Floating-point type of the allocated memory.
  * @tparam Device Device type where the memory will be allocated.
  */
-template <typename FPTYPE, typename Device>
+template <typename T, typename Device>
 struct resize_memory_op {
     /**
      * @brief Resize memory allocation.
@@ -25,15 +25,15 @@ struct resize_memory_op {
      * @param size New size of the allocated memory.
      * @param record_in Optional message to record the resize operation.
      */
-    void operator()(const Device* dev, FPTYPE*& arr, const size_t size, const char* record_in = nullptr);
+    void operator()(const Device* dev, T*& arr, const size_t size, const char* record_in = nullptr);
 };
 
 /**
  * @brief A functor to set memory to a constant value.
- * @tparam FPTYPE Floating-point type of the memory.
+ * @tparam T Floating-point type of the memory.
  * @tparam Device Device type where the memory is allocated.
  */
-template <typename FPTYPE, typename Device>
+template <typename T, typename Device>
 struct set_memory_op {
     /**
      * @brief Set memory to a constant value.
@@ -42,7 +42,7 @@ struct set_memory_op {
      * @param var Constant value to set.
      * @param size Size of the memory to set.
      */
-    void operator()(FPTYPE* arr, const int var, const size_t size);
+    void operator()(T* arr, const int var, const size_t size);
 };
 
 /**
@@ -50,11 +50,11 @@ struct set_memory_op {
  *
  * This class synchronizes memory between two different devices.
  *
- * @tparam FPTYPE The type of data in the arrays.
+ * @tparam T The type of data in the arrays.
  * @tparam Device_out The output device.
  * @tparam Device_in The input device.
  */
-template <typename FPTYPE, typename Device_out, typename Device_in>
+template <typename T, typename Device_out, typename Device_in>
 struct synchronize_memory_op {
     /**
      * @brief Synchronizes memory between devices.
@@ -68,8 +68,8 @@ struct synchronize_memory_op {
      * @param size The size of the array.
      */
     void operator()(
-        FPTYPE* arr_out,
-        const FPTYPE* arr_in,
+        T* arr_out,
+        const T* arr_in,
         const size_t size);
 };
 
@@ -78,12 +78,12 @@ struct synchronize_memory_op {
  *
  * This class casts memory between two different devices.
  *
- * @tparam FPTYPE_out The output data type.
- * @tparam FPTYPE_in The input data type.
+ * @tparam T_out The output data type.
+ * @tparam T_in The input data type.
  * @tparam Device_out The output device.
  * @tparam Device_in The input device.
  */
-template <typename FPTYPE_out, typename FPTYPE_in, typename Device_out, typename Device_in>
+template <typename T_out, typename T_in, typename Device_out, typename Device_in>
 struct cast_memory_op {
     /**
      * @brief Casts memory between devices.
@@ -97,8 +97,8 @@ struct cast_memory_op {
      * @param size The size of the array.
      */
     void operator()(
-        FPTYPE_out* arr_out,
-        const FPTYPE_in* arr_in,
+        T_out* arr_out,
+        const T_in* arr_in,
         const size_t size);
 };
 
@@ -108,10 +108,10 @@ struct cast_memory_op {
  *
  * This class deletes memory on a device.
  *
- * @tparam FPTYPE The type of data in the array.
+ * @tparam T The type of data in the array.
  * @tparam Device The device.
  */
-template <typename FPTYPE, typename Device>
+template <typename T, typename Device>
 struct delete_memory_op {
     /**
      * @brief Deletes memory on a device.
@@ -121,48 +121,48 @@ struct delete_memory_op {
      * @param dev The device.
      * @param arr The array to be deleted.
      */
-    void operator()(const Device* dev, FPTYPE* arr);
+    void operator()(const Device* dev, T* arr);
 };
 
 #if __CUDA || __UT_USE_CUDA || __ROCM || __UT_USE_ROCM
 // Partially specialize operator for container::GpuDevice.
-template <typename FPTYPE>
-struct resize_memory_op<FPTYPE, container::DEVICE_GPU> {
-void operator()(const container::DEVICE_GPU* dev, FPTYPE*& arr, const size_t size, const char* record_in = nullptr);
+template <typename T>
+struct resize_memory_op<T, container::DEVICE_GPU> {
+void operator()(const container::DEVICE_GPU* dev, T*& arr, const size_t size, const char* record_in = nullptr);
 };
 
-template <typename FPTYPE>
-struct set_memory_op<FPTYPE, container::DEVICE_GPU> {
-void operator()(FPTYPE* arr, const int var, const size_t size);
+template <typename T>
+struct set_memory_op<T, container::DEVICE_GPU> {
+void operator()(T* arr, const int var, const size_t size);
 };
 
-template <typename FPTYPE>
-struct synchronize_memory_op<FPTYPE, container::DEVICE_CPU, container::DEVICE_GPU> {
+template <typename T>
+struct synchronize_memory_op<T, container::DEVICE_CPU, container::DEVICE_GPU> {
 void operator()(
-  FPTYPE* arr_out,
-  const FPTYPE* arr_in,
+  T* arr_out,
+  const T* arr_in,
   const size_t size);
 };
 
-template <typename FPTYPE>
-struct synchronize_memory_op<FPTYPE, container::DEVICE_GPU, container::DEVICE_CPU> {
+template <typename T>
+struct synchronize_memory_op<T, container::DEVICE_GPU, container::DEVICE_CPU> {
 void operator()(
-  FPTYPE* arr_out,
-  const FPTYPE* arr_in,
+  T* arr_out,
+  const T* arr_in,
   const size_t size);
 };
 
-template <typename FPTYPE>
-struct synchronize_memory_op<FPTYPE, container::DEVICE_GPU, container::DEVICE_GPU> {
+template <typename T>
+struct synchronize_memory_op<T, container::DEVICE_GPU, container::DEVICE_GPU> {
 void operator()(
-  FPTYPE* arr_out,
-  const FPTYPE* arr_in,
+  T* arr_out,
+  const T* arr_in,
   const size_t size);
 };
 
-template <typename FPTYPE>
-struct delete_memory_op<FPTYPE, container::DEVICE_GPU> {
-void operator()(const container::DEVICE_GPU* dev, FPTYPE* arr);
+template <typename T>
+struct delete_memory_op<T, container::DEVICE_GPU> {
+void operator()(const container::DEVICE_GPU* dev, T* arr);
 };
 #endif
 // __CUDA || __UT_USE_CUDA || __ROCM || __UT_USE_ROCM

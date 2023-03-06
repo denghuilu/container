@@ -36,6 +36,7 @@ if(ENABLE_CUDA_TOOLKIT)
         CUDA::cufft
         CUDA::cudart
         CUDA::cublas
+        CUDA::cusolver
     )
     include_directories(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
     add_compile_definitions(__CUDA)

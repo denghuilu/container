@@ -7,6 +7,8 @@ list(APPEND device_srcs
 if(ENABLE_CUDA_TOOLKIT)
     list(APPEND device_srcs
         cuda/memory_op.cu
+        cuda/lapack_op.cu
+        cuda/blas_op.cu
     )
 endif()
 

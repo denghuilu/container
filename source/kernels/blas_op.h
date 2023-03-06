@@ -9,7 +9,7 @@
 #if defined(__CUDA) || defined(__UT_USE_CUDA)
 #include <cuda_runtime.h>
 #include "cublas_v2.h"
-static const char *_cublasGetErrorEnum(cublasStatus_t error) {
+static const char * cublasGetErrorEnum(cublasStatus_t error) {
     switch (error) {
         case CUBLAS_STATUS_SUCCESS:
             return "CUBLAS_STATUS_SUCCESS";
@@ -27,12 +27,13 @@ static const char *_cublasGetErrorEnum(cublasStatus_t error) {
             return "CUBLAS_STATUS_EXECUTION_FAILED";
         case CUBLAS_STATUS_INTERNAL_ERROR:
             return "CUBLAS_STATUS_INTERNAL_ERROR";
+        default:
+            return "Unknown";
     }
-    return "<unknown>";
 }
 inline void cublasAssert(cublasStatus_t code, const char *file, int line, bool abort=true) {
     if (code != CUBLAS_STATUS_SUCCESS) {
-        fprintf(stderr,"cuBLAS Assert: %s %s %d\n", _cublasGetErrorEnum(code), file, line);
+        fprintf(stderr,"cuBLAS Assert: %s %s %d\n", cublasGetErrorEnum(code), file, line);
         if (abort) exit(code);
     }
 }
@@ -40,8 +41,8 @@ inline void cublasAssert(cublasStatus_t code, const char *file, int line, bool a
 #define cublasErrcheck(res) { cublasAssert((res), __FILE__, __LINE__); }
 
 #define cudaErrcheck(res) {                                             \
-    if (e != cudaSuccess) {                                             \
-        printf("CUDA error %s:%d: %s\n", __FILE__, __LINE__, cudaGetErrorString(e)); \
+    if (res != cudaSuccess) {                                           \
+        printf("CUDA error %s:%d: %s\n", __FILE__, __LINE__, cudaGetErrorString(res)); \
         exit(EXIT_FAILURE);                                             \
     }                                                                   \
 }

@@ -6,29 +6,29 @@
 namespace container {
 namespace op {
 
-template <typename FPTYPE> 
-struct resize_memory_op<FPTYPE, container::DEVICE_CPU> {
-  void operator()(const container::DEVICE_CPU* dev, FPTYPE*& arr, const size_t size, const char* /*record_in*/) {
+template <typename T>
+struct resize_memory_op<T, container::DEVICE_CPU> {
+  void operator()(const container::DEVICE_CPU* dev, T*& arr, const size_t size, const char* /*record_in*/) {
     if (arr != nullptr) {
       free(arr);
     }
-    arr = (FPTYPE*) malloc(sizeof(FPTYPE) * size);
+    arr = (T*) malloc(sizeof(T) * size);
   }
 };
 
-template <typename FPTYPE> 
-struct set_memory_op<FPTYPE, container::DEVICE_CPU> {
-  void operator()(FPTYPE* arr, const int var, const size_t size) {
-    memset(arr, var, sizeof(FPTYPE) * size);
+template <typename T>
+struct set_memory_op<T, container::DEVICE_CPU> {
+  void operator()(T* arr, const int var, const size_t size) {
+    memset(arr, var, sizeof(T) * size);
   }
 };
 
-template <typename FPTYPE> 
-struct synchronize_memory_op<FPTYPE, container::DEVICE_CPU, container::DEVICE_CPU> {
-  void operator()(FPTYPE* arr_out,
-                  const FPTYPE* arr_in, 
+template <typename T>
+struct synchronize_memory_op<T, container::DEVICE_CPU, container::DEVICE_CPU> {
+  void operator()(T* arr_out,
+                  const T* arr_in,
                   const size_t size) {
-    memcpy(arr_out, arr_in, sizeof(FPTYPE) * size);
+    memcpy(arr_out, arr_in, sizeof(T) * size);
   }
 };
 
@@ -43,9 +43,9 @@ struct cast_memory_op<FPTYPE_out, FPTYPE_in, container::DEVICE_CPU, container::D
     }
 };
 
-template <typename FPTYPE>
-struct delete_memory_op<FPTYPE, container::DEVICE_CPU> {
-  void operator()(const container::DEVICE_CPU* dev, FPTYPE* arr) {
+template <typename T>
+struct delete_memory_op<T, container::DEVICE_CPU> {
+  void operator()(const container::DEVICE_CPU* dev, T* arr) {
     free(arr);
   }
 };
@@ -88,34 +88,34 @@ template struct delete_memory_op<std::complex<float>, container::DEVICE_CPU>;
 template struct delete_memory_op<std::complex<double>, container::DEVICE_CPU>;
 
 #if !(defined(__CUDA) || defined(__ROCM))
-template <typename FPTYPE>
-struct resize_memory_op<FPTYPE, container::DEVICE_GPU> {
-    void operator()(const container::DEVICE_GPU* dev, FPTYPE*& arr, const size_t size, const char* record_in = nullptr) {}
+template <typename T>
+struct resize_memory_op<T, container::DEVICE_GPU> {
+    void operator()(const container::DEVICE_GPU* dev, T*& arr, const size_t size, const char* record_in = nullptr) {}
 };
 
-template <typename FPTYPE>
-struct set_memory_op<FPTYPE, container::DEVICE_GPU> {
-    void operator()(FPTYPE* arr, const int var, const size_t size) {}
+template <typename T>
+struct set_memory_op<T, container::DEVICE_GPU> {
+    void operator()(T* arr, const int var, const size_t size) {}
 };
 
-template <typename FPTYPE>
-struct synchronize_memory_op<FPTYPE, container::DEVICE_GPU, container::DEVICE_GPU> {
-    void operator()(FPTYPE* arr_out,
-                    const FPTYPE* arr_in,
+template <typename T>
+struct synchronize_memory_op<T, container::DEVICE_GPU, container::DEVICE_GPU> {
+    void operator()(T* arr_out,
+                    const T* arr_in,
                     const size_t size) {}
 };
 
-template <typename FPTYPE>
-struct synchronize_memory_op<FPTYPE, container::DEVICE_GPU, container::DEVICE_CPU> {
-    void operator()(FPTYPE* arr_out,
-                    const FPTYPE* arr_in,
+template <typename T>
+struct synchronize_memory_op<T, container::DEVICE_GPU, container::DEVICE_CPU> {
+    void operator()(T* arr_out,
+                    const T* arr_in,
                     const size_t size) {}
 };
 
-template <typename FPTYPE>
-struct synchronize_memory_op<FPTYPE, container::DEVICE_CPU, container::DEVICE_GPU> {
-    void operator()(FPTYPE* arr_out,
-                    const FPTYPE* arr_in,
+template <typename T>
+struct synchronize_memory_op<T, container::DEVICE_CPU, container::DEVICE_GPU> {
+    void operator()(T* arr_out,
+                    const T* arr_in,
                     const size_t size) {}
 };
 
@@ -140,9 +140,9 @@ struct cast_memory_op<FPTYPE_out, FPTYPE_in, container::DEVICE_CPU, container::D
                     const size_t size) {}
 };
 
-template <typename FPTYPE>
-struct delete_memory_op<FPTYPE, container::DEVICE_GPU> {
-    void operator()(const container::DEVICE_GPU* dev, FPTYPE* arr) {}
+template <typename T>
+struct delete_memory_op<T, container::DEVICE_GPU> {
+    void operator()(const container::DEVICE_GPU* dev, T* arr) {}
 };
 
 template struct resize_memory_op<int, container::DEVICE_GPU>;

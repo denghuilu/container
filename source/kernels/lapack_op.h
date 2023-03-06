@@ -5,10 +5,59 @@
 #include "../tensor_types.h"
 #include "third_party//lapack_connector.h"
 
+#if defined(__CUDA) || defined(__UT_USE_CUDA)
+#include <cusolverDn.h>
+// cuSOLVER API errors
+static const char* cusolverGetErrorEnum(cusolverStatus_t error) {
+    switch (error) {
+        case CUSOLVER_STATUS_SUCCESS:
+            return "CUSOLVER_STATUS_SUCCESS";
+        case CUSOLVER_STATUS_NOT_INITIALIZED:
+            return "CUSOLVER_STATUS_NOT_INITIALIZED";
+        case CUSOLVER_STATUS_ALLOC_FAILED:
+            return "CUSOLVER_STATUS_ALLOC_FAILED";
+        case CUSOLVER_STATUS_INVALID_VALUE:
+            return "CUSOLVER_STATUS_INVALID_VALUE";
+        case CUSOLVER_STATUS_ARCH_MISMATCH:
+            return "CUSOLVER_STATUS_ARCH_MISMATCH";
+        case CUSOLVER_STATUS_MAPPING_ERROR:
+            return "CUSOLVER_STATUS_MAPPING_ERROR";
+        case CUSOLVER_STATUS_EXECUTION_FAILED:
+            return "CUSOLVER_STATUS_EXECUTION_FAILED";
+        case CUSOLVER_STATUS_INTERNAL_ERROR:
+            return "CUSOLVER_STATUS_INTERNAL_ERROR";
+        case CUSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED:
+            return "CUSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED";
+        case CUSOLVER_STATUS_NOT_SUPPORTED:
+            return "CUSOLVER_STATUS_NOT_SUPPORTED ";
+        case CUSOLVER_STATUS_ZERO_PIVOT:
+            return "CUSOLVER_STATUS_ZERO_PIVOT";
+        case CUSOLVER_STATUS_INVALID_LICENSE:
+            return "CUSOLVER_STATUS_INVALID_LICENSE";
+        default:
+            return "Unknown cusolverStatus_t message";
+    }
+}
+
+inline void cusolverAssert(cusolverStatus_t code, const char* file, int line, bool abort = true)
+{
+    if (code != CUSOLVER_STATUS_SUCCESS)
+    {
+        fprintf(stderr, "cuSOLVER Assert: %s %s %d\n", cusolverGetErrorEnum(code), file, line);
+        if (abort)
+            exit(code);
+    }
+}
+
+#define cusolverErrcheck(res) {                    \
+        cusolverAssert((res), __FILE__, __LINE__); \
+    }
+#endif // __CUDA || __UT_USE_CUDA
+
 namespace container {
 namespace op {
 
-template <typename FPTYPE, typename Device>
+template <typename T, typename Device>
 struct dngvd_op {
     /// @brief DNGVD computes all the eigenvalues and eigenvectors of a complex generalized
     /// Hermitian-definite eigenproblem. If eigenvectors are desired, it uses a divide and conquer algorithm.
@@ -31,14 +80,14 @@ struct dngvd_op {
     void operator()(const Device* d,
                     const int nstart,
                     const int ldh,
-                    const std::complex<FPTYPE>* A,
-                    const std::complex<FPTYPE>* B,
-                    FPTYPE* W,
-                    std::complex<FPTYPE>* V);
+                    const std::complex<T>* A,
+                    const std::complex<T>* B,
+                    T* W,
+                    std::complex<T>* V);
 };
 
 
-template <typename FPTYPE, typename Device>
+template <typename T, typename Device>
 struct dnevx_op {
     /// @brief DNEVX computes the first m eigenvalues ​​and their corresponding eigenvectors of
     /// a complex generalized Hermitian-definite eigenproblem
@@ -60,10 +109,10 @@ struct dnevx_op {
     void operator()(const Device* d,
                     const int nstart,
                     const int ldh,
-                    const std::complex<FPTYPE>* A,
+                    const std::complex<T>* A,
                     const int m,
-                    FPTYPE* W,
-                    std::complex<FPTYPE>* V);
+                    T* W,
+                    std::complex<T>* V);
 };
 
 
