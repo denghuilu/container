@@ -109,7 +109,6 @@ struct gemv_op<float, DEVICE_GPU> {
 template <>
 struct gemv_op<double, DEVICE_GPU> {
     void operator()(
-            const DEVICE_GPU *d,
             const char &trans,
             const int &m,
             const int &n,
@@ -139,19 +138,21 @@ struct gemv_op<double, DEVICE_GPU> {
 
 template <>
 struct gemm_op<float, DEVICE_GPU> {
-    void operator()(const char &transa,
-                    const char &transb,
-                    const int &m,
-                    const int &n,
-                    const int &k,
-                    const std::complex<float> *alpha,
-                    const std::complex<float> *a,
-                    const int &lda,
-                    const std::complex<float> *b,
-                    const int &ldb,
-                    const std::complex<float> *beta,
-                    std::complex<float> *c,
-                    const int &ldc) {
+    void operator()(
+            const char &transa,
+            const char &transb,
+            const int &m,
+            const int &n,
+            const int &k,
+            const std::complex<float> *alpha,
+            const std::complex<float> *a,
+            const int &lda,
+            const std::complex<float> *b,
+            const int &ldb,
+            const std::complex<float> *beta,
+            std::complex<float> *c,
+            const int &ldc)
+    {
         cublasOperation_t cutransA = {};
         cublasOperation_t cutransB = {};
         // cutransA

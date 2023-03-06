@@ -89,10 +89,11 @@ struct scal_op {
     ///
     /// Output Parameters
     /// \param X : output array
-    void operator()(const int& N,
-                    const std::complex<T>* alpha,
-                    std::complex<T>* X,
-                    const int& incx);
+    void operator()(
+            const int& N,
+            const std::complex<T>* alpha,
+            std::complex<T>* X,
+            const int& incx);
 };
 
 //  compute Y = alpha * X + Y
@@ -110,12 +111,13 @@ struct axpy_op {
     ///
     /// Output Parameters
     /// \param Y : output array Y
-    void operator()(const int& N,
-                    const std::complex<T>* alpha,
-                    const std::complex<T>* X,
-                    const int& incX,
-                    std::complex<T>* Y,
-                    const int& incY);
+    void operator()(
+            const int& N,
+            const std::complex<T>* alpha,
+            const std::complex<T>* X,
+            const int& incX,
+            std::complex<T>* Y,
+            const int& incY);
 };
 
 // compute y = alpha * op(A) * x + beta * y
@@ -138,17 +140,18 @@ struct gemv_op {
     ///
     /// Output Parameters
     /// \param Y : output array Y
-    void operator()(const char& trans,
-                    const int& m,
-                    const int& n,
-                    const std::complex<T>* alpha,
-                    const std::complex<T>* A,
-                    const int& lda,
-                    const std::complex<T>* X,
-                    const int& incx,
-                    const std::complex<T>* beta,
-                    std::complex<T>* Y,
-                    const int& incy);
+    void operator()(
+            const char &trans,
+            const int &m,
+            const int &n,
+            const std::complex<T> *alpha,
+            const std::complex<T> *A,
+            const int &lda,
+            const std::complex<T> *X,
+            const int &incx,
+            const std::complex<T> *beta,
+            std::complex<T> *Y,
+            const int &incy);
 };
 
 // compute C = alpha * op(A) * op(B) + beta * C
@@ -173,19 +176,20 @@ struct gemm_op {
     ///
     /// Output Parameters
     /// \param c : output matrix C
-    void operator()(const char& transa,
-                    const char& transb,
-                    const int& m,
-                    const int& n,
-                    const int& k,
-                    const std::complex<T> *alpha,
-                    const std::complex<T> *a,
-                    const int& lda,
-                    const std::complex<T> *b,
-                    const int& ldb,
-                    const std::complex<T> *beta,
-                    std::complex<T> *c,
-                    const int& ldc);
+    void operator()(
+            const char& transa,
+            const char& transb,
+            const int& m,
+            const int& n,
+            const int& k,
+            const std::complex<T> *alpha,
+            const std::complex<T> *a,
+            const int& lda,
+            const std::complex<T> *b,
+            const int& ldb,
+            const std::complex<T> *beta,
+            std::complex<T> *c,
+            const int& ldc);
 };
 
 #if __CUDA || __UT_USE_CUDA || __ROCM || __UT_USE_ROCM

@@ -3,7 +3,7 @@
 
 #include "../tensor.h"
 #include "../tensor_types.h"
-#include "third_party//lapack_connector.h"
+#include "third_party/lapack_connector.h"
 
 #if defined(__CUDA) || defined(__UT_USE_CUDA)
 #include <cusolverDn.h>
@@ -77,13 +77,13 @@ struct dngvd_op {
     /// Output Parameter
     ///     @param W : calculated eigenvalues
     ///     @param V : calculated eigenvectors (col major)
-    void operator()(const Device* d,
-                    const int nstart,
-                    const int ldh,
-                    const std::complex<T>* A,
-                    const std::complex<T>* B,
-                    T* W,
-                    std::complex<T>* V);
+    void operator()(
+            const int nstart,
+            const int ldh,
+            const std::complex<T>* A,
+            const std::complex<T>* B,
+            T* W,
+            std::complex<T>* V);
 };
 
 
@@ -106,13 +106,13 @@ struct dnevx_op {
     /// Output Parameter
     ///     @param W : calculated eigenvalues
     ///     @param V : calculated eigenvectors (row major)
-    void operator()(const Device* d,
-                    const int nstart,
-                    const int ldh,
-                    const std::complex<T>* A,
-                    const int m,
-                    T* W,
-                    std::complex<T>* V);
+    void operator()(
+            const int nstart,
+            const int ldh,
+            const std::complex<T>* A,
+            const int m,
+            T* W,
+            std::complex<T>* V);
 };
 
 

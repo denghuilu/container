@@ -155,7 +155,6 @@ void xheevd_wrapper (
 template <typename T>
 struct dngvd_op<T, DEVICE_GPU> {
     void operator()(
-            const DEVICE_GPU *d,
             const int nstart,
             const int ldh,
             const std::complex<T> *A, // hcc
@@ -174,7 +173,6 @@ struct dngvd_op<T, DEVICE_GPU> {
 template <typename T>
 struct dnevx_op<T, DEVICE_GPU> {
     void operator()(
-            const DEVICE_GPU *d,
             const int nstart,
             const int ldh,
             const std::complex<T> *A, // hcc
