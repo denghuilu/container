@@ -1,14 +1,16 @@
 list(APPEND device_srcs
+    blas_op.cpp
+    lapack_op.cpp
     memory_op.cpp
 )
 
-if(CONTAINER_ENABLE_CUDA_TOOLKIT)
+if(ENABLE_CUDA_TOOLKIT)
     list(APPEND device_srcs
         cuda/memory_op.cu
     )
 endif()
 
-if(CONTAINER_ENABLE_ROCM_TOOLKIT)
+if(ENABLE_HIP_TOOLKIT)
     hip_add_library(device_rocm STATIC
         rocm/memory_op.hip.cu
     )

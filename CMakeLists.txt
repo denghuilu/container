@@ -6,34 +6,15 @@ project(container
     LANGUAGES CXX
 )
 
-option (CONTAINER_ENABLE_CUDA_TOOLKIT "Enable support to CUDA for container." OFF)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+option (ENABLE_CUDA_TOOLKIT "Enable support to CUDA for container." OFF)
 
 set(CMAKE_CXX_STANDARD 11)
 
-if(CONTAINER_ENABLE_CUDA_TOOLKIT)
-    add_executable(
-        container
-        main.cpp
-        tensor.cpp
-        cpu_allocator.cpp
-        gpu_allocator.cpp
-        tensor_buffer.cpp
-        tensor_shape.cpp
-        tensor_types.cpp
-    )
-else()
-    add_executable(
-        container
-        main.cpp
-        tensor.cpp
-        cpu_allocator.cpp
-        tensor_buffer.cpp
-        tensor_shape.cpp
-        tensor_types.cpp
-    )
-endif()
+add_executable(container source/main.cpp)
 
-if(CONTAINER_ENABLE_CUDA_TOOLKIT)
+if(ENABLE_CUDA_TOOLKIT)
     include(CheckLanguage)
     check_language(CUDA)
     set(CMAKE_CXX_STANDARD 14)
@@ -63,6 +44,55 @@ if(CONTAINER_ENABLE_CUDA_TOOLKIT)
     endif()
 endif()
 
-add_subdirectory(kernels)
+if(DEFINED ENV{MKLROOT} AND NOT DEFINED MKLROOT)
+    set(MKLROOT "$ENV{MKLROOT}")
+endif()
+if(MKLROOT)
+    find_package(IntelMKL REQUIRED)
+    add_definitions(-D__MKL)
+    include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
 
-target_link_libraries(container PRIVATE device)
+    # Since libtorch will find its own MKL, the fftw part conflicts with the original one.
+    # When enable deepks, mkl will be linked within ${TORCH_LIBRARIES}.
+    if(NOT ENABLE_DEEPKS)
+        list(APPEND math_libs IntelMKL::MKL)
+    endif()
+else()
+    find_package(FFTW3 REQUIRED)
+    find_package(LAPACK REQUIRED)
+    find_package(ScaLAPACK REQUIRED)
+    include_directories(${FFTW3_INCLUDE_DIRS})
+    list(APPEND math_libs
+        FFTW3::FFTW3
+        LAPACK::LAPACK
+        ScaLAPACK::ScaLAPACK
+    )
+    if(USE_OPENMP)
+        list(APPEND math_libs FFTW3::FFTW3_OMP)
+    endif()
+    if (ENABLE_FLOAT_FFTW)
+        list(APPEND math_libs FFTW3::FFTW3_FLOAT)
+    endif()
+    if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
+        list(APPEND math_libs -lgfortran)
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES Intel)
+        list(APPEND math_libs -lifcore)
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+        list(APPEND math_libs -lgfortran)
+    else()
+        message(WARNING "Cannot find the correct library for Fortran.")
+    endif()
+endif()
+
+if (ENABLE_FLOAT_FFTW)
+    add_definitions(-D__ENABLE_FLOAT_FFTW)
+endif()
+
+add_subdirectory(source)
+
+target_link_libraries(
+    container
+    PRIVATE
+    source
+    device
+)

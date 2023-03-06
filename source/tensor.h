@@ -184,7 +184,7 @@ class Tensor {
 
         // Copy data to a specified device
         TEMPLATE_ALL_2(this->data_type_, this->device_,
-                   container::op::synchronize_memory_op<T_, DEVICE, DEVICE_>()(
+                   op::synchronize_memory_op<T_, DEVICE, DEVICE_>()(
                            output.data<T_>(), this->data<T_>(), this->NumElements()))
 
         return output;
@@ -205,11 +205,13 @@ class Tensor {
         // TODO: error handle of cast memory
         // Copy data to a specified device
         TEMPLATE_CZ_2(this->data_type_, this->device_,
-                   container::op::cast_memory_op<T, T_, DEVICE_, DEVICE_>()(
+                   op::cast_memory_op<T, T_, DEVICE_, DEVICE_>()(
                            output.data<T>(), this->data<T_>(), this->NumElements()))
 
         return output;
     }
+
+    void zero();
 
 private:
 

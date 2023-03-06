@@ -49,8 +49,7 @@ void resize_memory_op<FPTYPE, container::DEVICE_GPU>::operator()(
 
 template <typename FPTYPE>
 void set_memory_op<FPTYPE, container::DEVICE_GPU>::operator()(
-    const container::DEVICE_GPU* dev,
-    FPTYPE* arr, 
+    FPTYPE* arr,
     const int var, 
     const size_t size) 
 {

@@ -82,6 +82,10 @@ Allocator* Tensor::GetAllocator(DeviceType device) {
     return allocator;
 }
 
+void Tensor::zero() {
+    TEMPLATE_ALL_2(this->data_type_, this->device_,
+            op::set_memory_op<T_, DEVICE_>()(this->data<T_>(), 0, this->NumElements()))
+}
 
 // Overloaded operator<< for the Tensor class.
 std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {

@@ -38,12 +38,11 @@ struct set_memory_op {
     /**
      * @brief Set memory to a constant value.
      *
-     * @param dev Device where the memory is allocated.
      * @param arr Pointer to the memory.
      * @param var Constant value to set.
      * @param size Size of the memory to set.
      */
-    void operator()(const Device* dev, FPTYPE* arr, const int var, const size_t size);
+    void operator()(FPTYPE* arr, const int var, const size_t size);
 };
 
 /**
@@ -134,7 +133,7 @@ void operator()(const container::DEVICE_GPU* dev, FPTYPE*& arr, const size_t siz
 
 template <typename FPTYPE>
 struct set_memory_op<FPTYPE, container::DEVICE_GPU> {
-void operator()(const container::DEVICE_GPU* dev, FPTYPE* arr, const int var, const size_t size);
+void operator()(FPTYPE* arr, const int var, const size_t size);
 };
 
 template <typename FPTYPE>

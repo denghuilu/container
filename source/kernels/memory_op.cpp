@@ -18,7 +18,7 @@ struct resize_memory_op<FPTYPE, container::DEVICE_CPU> {
 
 template <typename FPTYPE> 
 struct set_memory_op<FPTYPE, container::DEVICE_CPU> {
-  void operator()(const container::DEVICE_CPU* dev, FPTYPE* arr, const int var, const size_t size) {
+  void operator()(FPTYPE* arr, const int var, const size_t size) {
     memset(arr, var, sizeof(FPTYPE) * size);
   }
 };
@@ -95,7 +95,7 @@ struct resize_memory_op<FPTYPE, container::DEVICE_GPU> {
 
 template <typename FPTYPE>
 struct set_memory_op<FPTYPE, container::DEVICE_GPU> {
-    void operator()(const container::DEVICE_GPU* dev, FPTYPE* arr, const int var, const size_t size) {}
+    void operator()(FPTYPE* arr, const int var, const size_t size) {}
 };
 
 template <typename FPTYPE>
