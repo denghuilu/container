@@ -40,10 +40,11 @@ Tensor::Tensor(const Tensor& other)
           shape_(other.shape_),
           device_(other.device_),
           allocator_(other.allocator_),
-          buffer_(allocator_, allocator_->allocate(shape_.NumElements() * SizeOfType(data_type_))) {
-    std::memcpy(buffer_.data(), other.data(), shape_.NumElements() * SizeOfType(data_type_));
-    // TEMPLATE_2(data_type_, device_, ops::memcpy<FPTYPE, Device>()(buffer_.data(), other.data(), shape_.NumElements()));
-    // TEMPLATE_4(data_type_, device_, ops::memcpy<FPTYPE, Device>()(buffer_.data(), other.data(), shape_.NumElements()));
+          buffer_(allocator_, allocator_->allocate(shape_.NumElements() * SizeOfType(data_type_)))
+{
+    TEMPLATE_ALL_2(data_type_, device_,
+            op::synchronize_memory_op<T_, DEVICE_, DEVICE_>()(
+                    this->data<T_>(), other.data<T_>(), this->NumElements()))
 }
 
 // Get the data type of the tensor.
@@ -122,6 +123,53 @@ void Tensor::reshape(TensorShape shape) {
         }
     }
     this->shape_ = shape;
+}
+
+// Slice the current tensor object.
+Tensor Tensor::slice(const std::vector<int> &start, const std::vector<int> &size) const {
+    // check the ndims of input shape
+    if (start.size() > 3 || size.size() > 3) {
+        throw std::invalid_argument("TensorSlice: The slice method only supports tensor ranks that are less than or equal to 3.");
+    }
+    // check the dimension size
+    if (start.size() != shape_.ndims() || size.size() != shape_.ndims()) {
+        throw std::invalid_argument("TensorSlice: start and size vectors must have same length as number of dimensions");
+    }
+
+    // check the boundary
+    for (int i = 0; i < start.size(); i++) {
+        if (start[i] < 0 || start[i] >= shape_.dim_size(i)) {
+            throw std::invalid_argument("TensorSlice: start index is out of bounds");
+        }
+        if (size[i] < 0 || start[i] + size[i] > shape_.dim_size(i)) {
+            throw std::invalid_argument("TensorSlice: size is out of bounds");
+        }
+    }
+
+    // set the output shape of the current tensor.
+    TensorShape output_shape = shape_;
+    for (int i = 0; i < start.size(); i++) {
+        output_shape.set_dim_size(i, size[i]);
+    }
+    Tensor output(this->data_type_, this->device_, output_shape);
+
+    // TODO: implement the data copy.
+    // copy the data from the input tensor to the output tensor
+    unsigned int ndim = shape_.ndims();
+    if (ndim == 1) {
+        TEMPLATE_ALL_2(this->data_type_, this->device_,
+                       op::synchronize_memory_op<T_, DEVICE_, DEVICE_>()(
+                               output.data<T_>(), this->data<T_>() + start[0], size[0]))
+    }
+    else if (ndim == 2) {
+        for (int i = 0; i < size[0]; i++) {
+            int offset = start[0] * shape_.dim_size(1) + start[1] + shape_.dim_size(1) * i;
+            TEMPLATE_ALL_2(this->data_type_, this->device_,
+                           op::synchronize_memory_op<T_, DEVICE_, DEVICE_>()(
+                                   output.data<T_>() + i * size[1], this->data<T_>() + offset, size[1]))
+        }
+    }
+    return output;
 }
 
 // Overloaded operator<< for the Tensor class.
