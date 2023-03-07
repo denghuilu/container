@@ -5,17 +5,17 @@
 
 int main() {
 
-    container::Tensor t1(container::DataType::DT_FLOAT, {6, 4});
+    container::Tensor t1(container::DataType::DT_INT, {6, 4});
     container::Tensor t2(
             container::DataTypeToEnum<std::complex<double>>::value,
             container::DeviceTypeToEnum<container::DEVICE_CPU>::value,
             container::TensorShape({3, 4}));
 
-    auto * t1_data = t1.data<float>();
+    auto * t1_data = t1.data<int>();
     auto * t2_data = t2.data<std::complex<double>>();
 
     for (int ii = 0; ii < t1.NumElements(); ii++) {
-        t1_data[ii] = static_cast<float>(ii);
+        t1_data[ii] = ii;
     }
     for (int ii = 0; ii < t2.NumElements(); ii++) {
         t2_data[ii] = {18.2222, -3232.10889};
@@ -28,16 +28,10 @@ int main() {
     t5.zero();
     t5.reshape({6, 2});
 
-    std::vector<container::Tensor> tensors {t1, t2, t3, t4, t5, t6};
+    std::vector<container::Tensor*> tensors {&t1, &t2, &t3, &t4, &t5, &t6};
 
-    for (const container::Tensor& t : tensors) {
-        std::cout << t << std::endl;
-        std::cout << "NumElements:\t" << t.NumElements() << std::endl;
-        std::cout << "TensorShape:\t" << t.shape() << std::endl;
-        std::cout << "DataType:\t" << t.data_type() << std::endl;
-        std::cout << "MemoryType:\t" << t.device_type() << std::endl;
-        std::cout << "Owns memory? :\t" << t.buffer().OwnsMemory() << std::endl;
-        std::cout << std::endl;
+    for (const container::Tensor* t : tensors) {
+        std::cout << *t << std::endl;
     }
     // TODO:
     // Add some math operations,

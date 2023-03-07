@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <cstring>
 #include <complex>
 
@@ -128,8 +129,8 @@ void Tensor::reshape(TensorShape shape) {
 // Slice the current tensor object.
 Tensor Tensor::slice(const std::vector<int> &start, const std::vector<int> &size) const {
     // check the ndims of input shape
-    if (start.size() > 3 || size.size() > 3) {
-        throw std::invalid_argument("TensorSlice: The slice method only supports tensor ranks that are less than or equal to 3.");
+    if (start.size() > 2 || size.size() > 2) {
+        throw std::invalid_argument("TensorSlice: The slice method only supports tensor ranks that are less than or equal to 2.");
     }
     // check the dimension size
     if (start.size() != shape_.ndims() || size.size() != shape_.ndims()) {
@@ -172,6 +173,50 @@ Tensor Tensor::slice(const std::vector<int> &start, const std::vector<int> &size
     return output;
 }
 
+template <typename T>
+__inline__
+void _internal(
+        std::ostream& os,
+        const T * data,
+        const TensorShape& shape,
+        const int64_t& num_elements)
+{
+    if (shape.ndims() == 1) {
+        os << "[";
+        for (int i = 0; i < num_elements; ++i) {
+            os << std::setw(6) << data[i];
+            if (i != num_elements - 1) {
+                os << ",";
+            }
+        }
+        os << "]";
+    }
+    else if (shape.ndims() == 2) {
+        os << "[";
+        for (int i = 0; i < shape.dim_size(0); ++i) {
+            if (i != 0) os << "       ";
+            os << "[";
+            for (int j = 0; j < shape.dim_size(1); ++j) {
+                os << std::setw(6) << data[i * shape.dim_size(1) + j];
+                if (j != shape.dim_size(1) - 1) {
+                    os << ",";
+                }
+            }
+            os << "]";
+            if (i != shape.dim_size(0) - 1) os << ",\n";
+        }
+        os << "]";
+    }
+    else {
+        for (int64_t i = 0; i < num_elements; ++i) {
+            os << data[i];
+            if (i < num_elements - 1) {
+                os << ",";
+            }
+        }
+    }
+}
+
 // Overloaded operator<< for the Tensor class.
 std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
     const int64_t num_elements = tensor.NumElements();
@@ -190,82 +235,53 @@ std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
     }
 
     os << "Tensor(";
-    os << "shape=(";
+    os << "shape=[";
     for (int i = 0; i < shape.ndims(); ++i) {
         os << shape.dim_size(i);
         if (i < shape.ndims() - 1) {
             os << ",";
         }
     }
-    os << "), data_type=" << data_type;
-    os << "), device_type=" << device_type;
-    os << ", buffer=[";
+    os << "], data_type=" << data_type;
+    os << ", device_type=" << device_type;
+    os << ", owns_memory=" << tensor.buffer().OwnsMemory();
+    os << ", buffer=\narray(";
     switch (data_type) {
         case DataType::DT_FLOAT: {
             const auto* data = static_cast<const float*>(data_);
-            for (int64_t i = 0; i < num_elements; ++i) {
-                os << data[i];
-                if (i < num_elements - 1) {
-                    os << ",";
-                }
-            }
+            _internal(os, data, shape, num_elements);
             break;
         }
         case DataType::DT_DOUBLE: {
             const auto* data = static_cast<const double*>(data_);
-            for (int64_t i = 0; i < num_elements; ++i) {
-                os << data[i];
-                if (i < num_elements - 1) {
-                    os << ",";
-                }
-            }
+            _internal(os, data, shape, num_elements);
             break;
         }
         case DataType::DT_INT: {
             const auto* data = static_cast<const int*>(data_);
-            for (int64_t i = 0; i < num_elements; ++i) {
-                os << data[i];
-                if (i < num_elements - 1) {
-                    os << ",";
-                }
-            }
+            _internal(os, data, shape, num_elements);
             break;
         }
         case DataType::DT_INT64: {
             const auto* data = static_cast<const int64_t*>(data_);
-            for (int64_t i = 0; i < num_elements; ++i) {
-                os << data[i];
-                if (i < num_elements - 1) {
-                    os << ",";
-                }
-            }
+            _internal(os, data, shape, num_elements);
             break;
         }
         case DataType::DT_COMPLEX: {
             const auto* data = static_cast<const std::complex<float>*>(data_);
-            for (int64_t i = 0; i < num_elements; ++i) {
-                os << "{" << data[i].real() << ", " << data[i].imag() << "}";
-                if (i < num_elements - 1) {
-                    os << ",";
-                }
-            }
+            _internal(os, data, shape, num_elements);
             break;
         }
         case DataType::DT_COMPLEX_DOUBLE: {
             const auto* data = static_cast<const std::complex<double>*>(data_);
-            for (int64_t i = 0; i < num_elements; ++i) {
-                os << "{" << data[i].real() << ", " << data[i].imag() << "}";
-                if (i < num_elements - 1) {
-                    os << ",";
-                }
-            }
+            _internal(os, data, shape, num_elements);
             break;
         }
         default:
             os << "unknown";
             break;
     }
-    os << "])";
+    os << "))\n";
 
     // delete the temporary data
     if (device_type != DeviceType::CpuDevice) {
