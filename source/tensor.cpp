@@ -175,7 +175,7 @@ Tensor Tensor::slice(const std::vector<int> &start, const std::vector<int> &size
 
 template <typename T>
 __inline__
-void _internal(
+void _internal_output(
         std::ostream& os,
         const T * data,
         const TensorShape& shape,
@@ -249,32 +249,32 @@ std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
     switch (data_type) {
         case DataType::DT_FLOAT: {
             const auto* data = static_cast<const float*>(data_);
-            _internal(os, data, shape, num_elements);
+            _internal_output(os, data, shape, num_elements);
             break;
         }
         case DataType::DT_DOUBLE: {
             const auto* data = static_cast<const double*>(data_);
-            _internal(os, data, shape, num_elements);
+            _internal_output(os, data, shape, num_elements);
             break;
         }
         case DataType::DT_INT: {
             const auto* data = static_cast<const int*>(data_);
-            _internal(os, data, shape, num_elements);
+            _internal_output(os, data, shape, num_elements);
             break;
         }
         case DataType::DT_INT64: {
             const auto* data = static_cast<const int64_t*>(data_);
-            _internal(os, data, shape, num_elements);
+            _internal_output(os, data, shape, num_elements);
             break;
         }
         case DataType::DT_COMPLEX: {
             const auto* data = static_cast<const std::complex<float>*>(data_);
-            _internal(os, data, shape, num_elements);
+            _internal_output(os, data, shape, num_elements);
             break;
         }
         case DataType::DT_COMPLEX_DOUBLE: {
             const auto* data = static_cast<const std::complex<double>*>(data_);
-            _internal(os, data, shape, num_elements);
+            _internal_output(os, data, shape, num_elements);
             break;
         }
         default:
