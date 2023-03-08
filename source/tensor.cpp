@@ -1,9 +1,10 @@
+#include <cmath>
 #include <iostream>
 #include <iomanip>
-#include <cstring>
 #include <complex>
 
 #include "tensor.h"
+#include "tensor_utils.h"
 #include "cpu_allocator.h"
 #if defined(__CUDA)
 #include "gpu_allocator.h"
@@ -186,72 +187,6 @@ Tensor Tensor::slice(const std::vector<int> &start, const std::vector<int> &size
     return output;
 }
 
-template <typename T>
-__inline__
-void _internal_output(
-        std::ostream& os,
-        const T * data,
-        const TensorShape& shape,
-        const int64_t& num_elements)
-{
-    if (shape.ndim() == 1) {
-        os << "[";
-        for (int i = 0; i < num_elements; ++i) {
-            os << std::setw(6) << data[i];
-            if (i != num_elements - 1) {
-                os << ",";
-            }
-        }
-        os << "]";
-    }
-    else if (shape.ndim() == 2) {
-        os << "[";
-        for (int i = 0; i < shape.dim_size(0); ++i) {
-            if (i != 0) os << "       ";
-            os << "[";
-            for (int j = 0; j < shape.dim_size(1); ++j) {
-                os << std::setw(2) << data[i * shape.dim_size(1) + j];
-                if (j != shape.dim_size(1) - 1) {
-                    os << ", ";
-                }
-            }
-            os << "]";
-            if (i != shape.dim_size(0) - 1) os << ",\n";
-        }
-        os << "]";
-    }
-    else if (shape.ndim() == 3) {
-        os << "[";
-        for (int i = 0; i < shape.dim_size(0); ++i) {
-            if (i != 0) os << "       ";
-            os << "[";
-            for (int j = 0; j < shape.dim_size(1); ++j) {
-                if (j != 0) os << "        ";
-                os << "[";
-                for (int k = 0; k < shape.dim_size(2); ++k) {
-                    os << std::setw(2) << data[i * shape.dim_size(1) * shape.dim_size(2) + j * shape.dim_size(2) + k];
-                    if (k != shape.dim_size(2) - 1) {
-                        os << ", ";
-                    }
-                }
-                os << "]";
-                if (j != shape.dim_size(1) - 1) os << ",\n";
-            }
-            os << "]";
-            if (i != shape.dim_size(0) - 1) os << ",\n\n";
-        }
-        os << "]";
-    }
-    else {
-        for (int64_t i = 0; i < num_elements; ++i) {
-            os << data[i];
-            if (i < num_elements - 1) {
-                os << ", ";
-            }
-        }
-    }
-}
-
 // Overloaded operator<< for the Tensor class.
 std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
     const int64_t num_elements = tensor.NumElements();
@@ -259,7 +194,7 @@ std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
     const DeviceType device_type = tensor.device_type();
     const TensorShape& shape = tensor.shape();
 
-    // Copy the data form device to host for output
+    // Copy the data from device to host for output
     auto * data_ = tensor.data();
     if (device_type != DeviceType::CpuDevice) {
         data_ = malloc(num_elements * Tensor::SizeOfType(data_type));
