@@ -234,6 +234,8 @@ class Tensor {
      * @param size A vector of integers representing the size of the slice along each dimension.
      *
      * @return A new Tensor slice.
+     *
+     * @note Currently, this method only supports tensors with a rank of less than or equal to 2.
      */
     Tensor slice(const std::vector<int>& start, const std::vector<int>& size) const;
 
