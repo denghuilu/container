@@ -235,7 +235,7 @@ class Tensor {
      *
      * @return A new Tensor slice.
      *
-     * @note Currently, this method only supports tensors with a rank of less than or equal to 2.
+     * @note Currently, this method only supports tensors with a ndim of less than or equal to 3.
      */
     Tensor slice(const std::vector<int>& start, const std::vector<int>& size) const;
 

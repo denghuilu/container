@@ -5,7 +5,7 @@
 
 int main() {
 
-    container::Tensor t1(container::DataType::DT_INT, {6, 4});
+    container::Tensor t1(container::DataType::DT_INT, {2, 3, 4});
     container::Tensor t2(
             container::DataTypeToEnum<std::complex<double>>::value,
             container::DeviceTypeToEnum<container::DEVICE_CPU>::value,
@@ -24,7 +24,7 @@ int main() {
     container::Tensor t3(t1_data, t1.data_type(), t1.device_type(), t1.shape());
     container::Tensor t4 = t2.to_device<container::DEVICE_GPU>();
     container::Tensor t5 = t4.cast<std::complex<float>>().to_device<container::DEVICE_CPU>();
-    container::Tensor t6 = t1.slice({1, 1}, {2, 3});
+    container::Tensor t6 = t1.slice({0, 1, 1}, {2, 2, 2});
     t5.zero();
     t5.reshape({6, 2});
 

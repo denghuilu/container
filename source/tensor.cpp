@@ -128,12 +128,12 @@ void Tensor::reshape(TensorShape shape) {
 
 // Slice the current tensor object.
 Tensor Tensor::slice(const std::vector<int> &start, const std::vector<int> &size) const {
-    // check the ndims of input shape
-    if (start.size() > 2 || size.size() > 2) {
+    // check the ndim of input shape
+    if (start.size() > 3 || size.size() > 3) {
         throw std::invalid_argument("TensorSlice: The slice method only supports tensor ranks that are less than or equal to 2.");
     }
     // check the dimension size
-    if (start.size() != shape_.ndims() || size.size() != shape_.ndims()) {
+    if (start.size() != shape_.ndim() || size.size() != shape_.ndim()) {
         throw std::invalid_argument("TensorSlice: start and size vectors must have same length as number of dimensions");
     }
 
@@ -156,7 +156,7 @@ Tensor Tensor::slice(const std::vector<int> &start, const std::vector<int> &size
 
     // TODO: implement the data copy.
     // copy the data from the input tensor to the output tensor
-    unsigned int ndim = shape_.ndims();
+    unsigned int ndim = shape_.ndim();
     if (ndim == 1) {
         TEMPLATE_ALL_2(this->data_type_, this->device_,
                        op::synchronize_memory_op<T_, DEVICE_, DEVICE_>()(
@@ -164,10 +164,23 @@ Tensor Tensor::slice(const std::vector<int> &start, const std::vector<int> &size
     }
     else if (ndim == 2) {
         for (int i = 0; i < size[0]; i++) {
-            int offset = start[0] * shape_.dim_size(1) + start[1] + shape_.dim_size(1) * i;
+            int offset = (start[0] + i) * shape_.dim_size(1) + start[1];
+            int offset_out = i * size[1];
             TEMPLATE_ALL_2(this->data_type_, this->device_,
                            op::synchronize_memory_op<T_, DEVICE_, DEVICE_>()(
-                                   output.data<T_>() + i * size[1], this->data<T_>() + offset, size[1]))
+                                   output.data<T_>() + offset_out, this->data<T_>() + offset, size[1]))
+        }
+    }
+    else if (ndim == 3) {
+        for (int i = 0; i < size[0]; i++) {
+            for (int j = 0; j < size[1]; j++) {
+                int offset = (i + start[0]) * shape_.dim_size(1) * shape_.dim_size(2) +
+                        (j + start[1]) * shape_.dim_size(2) + start[2];
+                int offset_out = i * size[1] * size[2] + j * size[2];
+                TEMPLATE_ALL_2(this->data_type_, this->device_,
+                               op::synchronize_memory_op<T_, DEVICE_, DEVICE_>()(
+                                       output.data<T_>() + offset_out, this->data<T_>() + offset, size[1]))
+            }
         }
     }
     return output;
@@ -181,7 +194,7 @@ void _internal_output(
         const TensorShape& shape,
         const int64_t& num_elements)
 {
-    if (shape.ndims() == 1) {
+    if (shape.ndim() == 1) {
         os << "[";
         for (int i = 0; i < num_elements; ++i) {
             os << std::setw(6) << data[i];
@@ -191,15 +204,15 @@ void _internal_output(
         }
         os << "]";
     }
-    else if (shape.ndims() == 2) {
+    else if (shape.ndim() == 2) {
         os << "[";
         for (int i = 0; i < shape.dim_size(0); ++i) {
             if (i != 0) os << "       ";
             os << "[";
             for (int j = 0; j < shape.dim_size(1); ++j) {
-                os << std::setw(6) << data[i * shape.dim_size(1) + j];
+                os << std::setw(2) << data[i * shape.dim_size(1) + j];
                 if (j != shape.dim_size(1) - 1) {
-                    os << ",";
+                    os << ", ";
                 }
             }
             os << "]";
@@ -207,11 +220,33 @@ void _internal_output(
         }
         os << "]";
     }
+    else if (shape.ndim() == 3) {
+        os << "[";
+        for (int i = 0; i < shape.dim_size(0); ++i) {
+            if (i != 0) os << "       ";
+            os << "[";
+            for (int j = 0; j < shape.dim_size(1); ++j) {
+                if (j != 0) os << "        ";
+                os << "[";
+                for (int k = 0; k < shape.dim_size(2); ++k) {
+                    os << std::setw(2) << data[i * shape.dim_size(1) * shape.dim_size(2) + j * shape.dim_size(2) + k];
+                    if (k != shape.dim_size(2) - 1) {
+                        os << ", ";
+                    }
+                }
+                os << "]";
+                if (j != shape.dim_size(1) - 1) os << ",\n";
+            }
+            os << "]";
+            if (i != shape.dim_size(0) - 1) os << ",\n\n";
+        }
+        os << "]";
+    }
     else {
         for (int64_t i = 0; i < num_elements; ++i) {
             os << data[i];
             if (i < num_elements - 1) {
-                os << ",";
+                os << ", ";
             }
         }
     }
@@ -236,9 +271,9 @@ std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
 
     os << "Tensor(";
     os << "shape=[";
-    for (int i = 0; i < shape.ndims(); ++i) {
+    for (int i = 0; i < shape.ndim(); ++i) {
         os << shape.dim_size(i);
-        if (i < shape.ndims() - 1) {
+        if (i < shape.ndim() - 1) {
             os << ",";
         }
     }

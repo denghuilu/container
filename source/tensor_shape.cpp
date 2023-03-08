@@ -34,15 +34,15 @@ const std::vector<int>& TensorShape::dims() const {
     return dims_;
 }
 
-// Get rank of the tensor, i.e., number of dimensions
-unsigned int TensorShape::ndims() const {
+// Get ndim of the tensor, i.e., number of dimensions
+unsigned int TensorShape::ndim() const {
     return dims_.size();
 }
 
 // Returns the total number of elements in the shape.
 int64_t TensorShape::NumElements() const {
     int64_t num_elements = 1;
-    for (int i = 0; i < this->ndims(); ++i) {
+    for (int i = 0; i < this->ndim(); ++i) {
         num_elements *= dims_[i];
     }
     return num_elements;
@@ -76,9 +76,9 @@ bool TensorShape::operator!=(const TensorShape& other) const {
 // Overload the << operator to print the tensor shape
 std::ostream& operator<<(std::ostream& os, const TensorShape& shape) {
     os << "[";
-    for (int i = 0; i < shape.ndims(); ++i) {
+    for (int i = 0; i < shape.ndim(); ++i) {
         os << shape.dims()[i];
-        if (i < shape.ndims() - 1) {
+        if (i < shape.ndim() - 1) {
             os << ",";
         }
     }
