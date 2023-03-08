@@ -49,10 +49,10 @@ public:
     const std::vector<int>& dims() const;
 
     /**
-     * @brief Get the rank of the tensor.
+     * @brief Get the ndim of the tensor.
      * @return The number of dimensions in the tensor.
      */
-    unsigned int ndims() const;
+    unsigned int ndim() const;
 
     /**
      * @brief Modify the size of a dimension in the tensor.

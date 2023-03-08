@@ -183,8 +183,9 @@ class Tensor {
         Tensor output(this->data_type_, DeviceTypeToEnum<DEVICE>::value, this->shape_);
 
         // Copy data to a specified device
+        // TODO: move the memory operator into the tensor_buff class.
         TEMPLATE_ALL_2(this->data_type_, this->device_,
-                   container::op::synchronize_memory_op<T_, DEVICE, DEVICE_>()(
+                   op::synchronize_memory_op<T_, DEVICE, DEVICE_>()(
                            output.data<T_>(), this->data<T_>(), this->NumElements()))
 
         return output;
@@ -203,13 +204,40 @@ class Tensor {
         Tensor output(DataTypeToEnum<T>::value, this->device_, this->shape_);
 
         // TODO: error handle of cast memory
+        // TODO: move the memory operator into the tensor_buff class.
         // Copy data to a specified device
         TEMPLATE_CZ_2(this->data_type_, this->device_,
-                   container::op::cast_memory_op<T, T_, DEVICE_, DEVICE_>()(
+                   op::cast_memory_op<T, T_, DEVICE_, DEVICE_>()(
                            output.data<T>(), this->data<T_>(), this->NumElements()))
 
         return output;
     }
+
+    /**
+     * @brief Set all elements in current tensor object to zero.
+     */
+    void zero();
+
+    /**
+     * @brief Set all elements in current tensor object to zero.
+     *
+     * @param shape The new shape of the tensor.
+     *
+     * @note There can be one -1 dimension in the input shape, indicates the auto reshape.
+     */
+    void reshape(TensorShape shape);
+
+    /**
+     * @brief Return a new Tensor slice starting at the specified indices with the given size.
+     *
+     * @param start A vector of integers representing the starting indices of the slice.
+     * @param size A vector of integers representing the size of the slice along each dimension.
+     *
+     * @return A new Tensor slice.
+     *
+     * @note Currently, this method only supports tensors with a ndim of less than or equal to 3.
+     */
+    Tensor slice(const std::vector<int>& start, const std::vector<int>& size) const;
 
 private:
 

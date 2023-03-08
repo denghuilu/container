@@ -10,122 +10,121 @@
 namespace container {
 namespace op {
 
-template <typename FPTYPE_out, typename FPTYPE_in>
+template <typename T_out, typename T_in>
 __global__ void cast_memory(
-        FPTYPE_out* out,
-        const FPTYPE_in* in,
+        T_out* out,
+        const T_in* in,
         const int size)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx >= size) {return;}
-    out[idx] = static_cast<FPTYPE_out>(in[idx]);
+    out[idx] = static_cast<T_out>(in[idx]);
 }
 
-template <typename FPTYPE_out, typename FPTYPE_in>
+template <typename T_out, typename T_in>
 __global__ void cast_memory(
-        std::complex<FPTYPE_out>* out,
-        const std::complex<FPTYPE_in>* in,
+        std::complex<T_out>* out,
+        const std::complex<T_in>* in,
         const int size)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx >= size) {return;}
-    auto* _out = reinterpret_cast<thrust::complex<FPTYPE_out>*>(out);
-    const auto* _in = reinterpret_cast<const thrust::complex<FPTYPE_in>*>(in);
-    _out[idx] = static_cast<thrust::complex<FPTYPE_out>>(_in[idx]);
+    auto* _out = reinterpret_cast<thrust::complex<T_out>*>(out);
+    const auto* _in = reinterpret_cast<const thrust::complex<T_in>*>(in);
+    _out[idx] = static_cast<thrust::complex<T_out>>(_in[idx]);
 }
 
-template <typename FPTYPE>
-void resize_memory_op<FPTYPE, container::DEVICE_GPU>::operator()(
+template <typename T>
+void resize_memory_op<T, container::DEVICE_GPU>::operator()(
     const container::DEVICE_GPU* dev,
-    FPTYPE*& arr, 
+    T*& arr,
     const size_t size,
     const char* record_in)
 {
   if (arr != nullptr) {
-    delete_memory_op<FPTYPE, container::DEVICE_GPU>()(dev, arr);
+    delete_memory_op<T, container::DEVICE_GPU>()(dev, arr);
   }
-  cudaMalloc((void **)&arr, sizeof(FPTYPE) * size);
+  cudaMalloc((void **)&arr, sizeof(T) * size);
 }
 
-template <typename FPTYPE>
-void set_memory_op<FPTYPE, container::DEVICE_GPU>::operator()(
-    const container::DEVICE_GPU* dev,
-    FPTYPE* arr, 
+template <typename T>
+void set_memory_op<T, container::DEVICE_GPU>::operator()(
+    T* arr,
     const int var, 
     const size_t size) 
 {
-  cudaMemset(arr, var, sizeof(FPTYPE) * size);  
+  cudaMemset(arr, var, sizeof(T) * size);
 }
 
-template <typename FPTYPE> 
-void synchronize_memory_op<FPTYPE, container::DEVICE_CPU, container::DEVICE_GPU>::operator()(
-    FPTYPE* arr_out,
-    const FPTYPE* arr_in,
+template <typename T>
+void synchronize_memory_op<T, container::DEVICE_CPU, container::DEVICE_GPU>::operator()(
+    T* arr_out,
+    const T* arr_in,
     const size_t size) 
 {
-  cudaMemcpy(arr_out, arr_in, sizeof(FPTYPE) * size, cudaMemcpyDeviceToHost);  
+  cudaMemcpy(arr_out, arr_in, sizeof(T) * size, cudaMemcpyDeviceToHost);
 }
 
-template <typename FPTYPE> 
-void synchronize_memory_op<FPTYPE, container::DEVICE_GPU, container::DEVICE_CPU>::operator()(
-    FPTYPE* arr_out,
-    const FPTYPE* arr_in,
+template <typename T>
+void synchronize_memory_op<T, container::DEVICE_GPU, container::DEVICE_CPU>::operator()(
+    T* arr_out,
+    const T* arr_in,
     const size_t size) 
 {
-  cudaMemcpy(arr_out, arr_in, sizeof(FPTYPE) * size, cudaMemcpyHostToDevice);  
+  cudaMemcpy(arr_out, arr_in, sizeof(T) * size, cudaMemcpyHostToDevice);
 }
 
-template <typename FPTYPE> 
-void synchronize_memory_op<FPTYPE, container::DEVICE_GPU, container::DEVICE_GPU>::operator()(
-    FPTYPE* arr_out,
-    const FPTYPE* arr_in,
+template <typename T>
+void synchronize_memory_op<T, container::DEVICE_GPU, container::DEVICE_GPU>::operator()(
+    T* arr_out,
+    const T* arr_in,
     const size_t size) 
 {
-  cudaMemcpy(arr_out, arr_in, sizeof(FPTYPE) * size, cudaMemcpyDeviceToDevice);  
+  cudaMemcpy(arr_out, arr_in, sizeof(T) * size, cudaMemcpyDeviceToDevice);
 }
 
-template <typename FPTYPE_out, typename FPTYPE_in>
-struct cast_memory_op<FPTYPE_out, FPTYPE_in, container::DEVICE_GPU, container::DEVICE_GPU> {
-    void operator()(FPTYPE_out* arr_out,
-                    const FPTYPE_in* arr_in,
+template <typename T_out, typename T_in>
+struct cast_memory_op<T_out, T_in, container::DEVICE_GPU, container::DEVICE_GPU> {
+    void operator()(T_out* arr_out,
+                    const T_in* arr_in,
                     const size_t size) {
         const int block = (size + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
         cast_memory<<<block, THREADS_PER_BLOCK>>>(arr_out, arr_in, size);
     }
 };
 
-template <typename FPTYPE_out, typename FPTYPE_in>
-struct cast_memory_op<FPTYPE_out, FPTYPE_in, container::DEVICE_GPU, container::DEVICE_CPU> {
-    void operator()(FPTYPE_out* arr_out,
-                    const FPTYPE_in* arr_in,
+template <typename T_out, typename T_in>
+struct cast_memory_op<T_out, T_in, container::DEVICE_GPU, container::DEVICE_CPU> {
+    void operator()(T_out* arr_out,
+                    const T_in* arr_in,
                     const size_t size) {
-        FPTYPE_in * arr = nullptr;
-        cudaMalloc((void **)&arr, sizeof(FPTYPE_in) * size);
-        cudaMemcpy(arr, arr_in, sizeof(FPTYPE_in) * size, cudaMemcpyHostToDevice);
+        T_in * arr = nullptr;
+        cudaMalloc((void **)&arr, sizeof(T_in) * size);
+        cudaMemcpy(arr, arr_in, sizeof(T_in) * size, cudaMemcpyHostToDevice);
         const int block = (size + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
         cast_memory<<<block, THREADS_PER_BLOCK>>>(arr_out, arr, size);
         cudaFree(arr);
     }
 };
 
-template <typename FPTYPE_out, typename FPTYPE_in>
-struct cast_memory_op<FPTYPE_out, FPTYPE_in, container::DEVICE_CPU, container::DEVICE_GPU> {
-    void operator()(FPTYPE_out* arr_out,
-                    const FPTYPE_in* arr_in,
+template <typename T_out, typename T_in>
+struct cast_memory_op<T_out, T_in, container::DEVICE_CPU, container::DEVICE_GPU> {
+    void operator()(T_out* arr_out,
+                    const T_in* arr_in,
                     const size_t size) {
-        auto * arr = (FPTYPE_in*) malloc(sizeof(FPTYPE_in) * size);
-        cudaMemcpy(arr, arr_in, sizeof(FPTYPE_in) * size, cudaMemcpyDeviceToHost);
+        auto * arr = (T_in*) malloc(sizeof(T_in) * size);
+        cudaMemcpy(arr, arr_in, sizeof(T_in) * size, cudaMemcpyDeviceToHost);
         for (int ii = 0; ii < size; ii++) {
-            arr_out[ii] = static_cast<FPTYPE_out>(arr[ii]);
+            arr_out[ii] = static_cast<T_out>(arr[ii]);
         }
         free(arr);
     }
 };
 
-template <typename FPTYPE>
-void delete_memory_op<FPTYPE, container::DEVICE_GPU>::operator() (
+template <typename T>
+void delete_memory_op<T, container::DEVICE_GPU>::operator() (
     const container::DEVICE_GPU* dev,
-    FPTYPE* arr) 
+    T* arr)
 {
   cudaFree(arr);
 }
