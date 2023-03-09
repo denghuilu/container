@@ -14,7 +14,7 @@ namespace container {
 /**
  * @brief A multi-dimensional array of elements of a single data type.
  *
- * This class represents a Tensor, which is a fundamental concept in ABACUS.
+ * This class represents a Tensor, which is a fundamental concept in container.
  * A Tensor has a data type, shape, and memory buffer that stores the actual data.
  *
  * This class is not thread-safe and should not be accessed by multiple threads
@@ -40,19 +40,6 @@ class Tensor {
      * @param device The data type of the tensor.
      */
     Tensor(DataType data_type, DeviceType device, const TensorShape& shape);
-
-    /**
-     * @brief Constructor that creates a tensor with the given data pointer,
-     * data type, device type and shape.
-     *
-     * This tensor does not own memory.
-     *
-     * @param data The data pointer.
-     * @param data_type The data type of the tensor.
-     * @param device The data type of the tensor.
-     * @param shape The shape of the tensor.
-     */
-    Tensor(void * data, DataType data_type, DeviceType device, const TensorShape& shape);
 
     /**
      * @brief Construct a new Tensor object by copying another Tensor.
@@ -238,6 +225,20 @@ class Tensor {
      * @note Currently, this method only supports tensors with a ndim of less than or equal to 3.
      */
     Tensor slice(const std::vector<int>& start, const std::vector<int>& size) const;
+
+protected:
+    /**
+     * @brief Constructor that creates a tensor with the given data pointer,
+     * data type, device type and shape.
+     *
+     * This tensor does not own memory.
+     *
+     * @param data The data pointer.
+     * @param data_type The data type of the tensor.
+     * @param device The data type of the tensor.
+     * @param shape The shape of the tensor.
+     */
+    Tensor(void * data, DataType data_type, DeviceType device, const TensorShape& shape);
 
 private:
 

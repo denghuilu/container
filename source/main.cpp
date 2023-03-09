@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "tensor.h"
+#include "tensor_map.h"
 
 int main() {
 
@@ -30,7 +31,7 @@ int main() {
     }
     t2_data[7] = {183.22221, -3232.10889};
 
-    container::Tensor t3(t1_data, t1.data_type(), t1.device_type(), t1.shape());
+    container::TensorMap t3(t1_data, t1.data_type(), t1.device_type(), t1.shape());
     container::Tensor t4 = t2.to_device<container::DEVICE_GPU>();
     container::Tensor t5 = t4.cast<std::complex<float>>().to_device<container::DEVICE_CPU>();
     container::Tensor t6 = t1.slice({0, 1, 1}, {2, 2, 2});

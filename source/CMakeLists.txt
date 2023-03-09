@@ -1,5 +1,6 @@
 list(APPEND source_srcs
     tensor.cpp
+    tensor_map.cpp
     cpu_allocator.cpp
     tensor_buffer.cpp
     tensor_shape.cpp
