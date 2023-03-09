@@ -51,16 +51,16 @@ DeviceType TensorBuffer::GetDeviceType() const {
 
 void TensorBuffer::resize(size_t size) {
     // Allocate a new buffer.
-    void* new_data = alloc_->allocate(size);
+    void* new_data = this->alloc_->allocate(size);
 
     // Free the old buffer.
-    if (OwnsMemory()) {
-        alloc_->free(data_);
+    if (this->OwnsMemory()) {
+        this->alloc_->free(data_);
     }
 
     // Update the internal state.
-    data_ = new_data;
-    owns_memory = true;
+    this->data_ = new_data;
+    this->owns_memory = true;
 }
 
 }  // namespace container

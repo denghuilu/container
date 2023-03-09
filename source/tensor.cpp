@@ -192,7 +192,7 @@ void Tensor::resize(const TensorShape& new_shape) {
     if (shape_ == new_shape) {
         return;
     }
-    buffer_.resize(new_shape.NumElements());
+    buffer_.resize(new_shape.NumElements() * Tensor::SizeOfType(data_type_));
     shape_ = new_shape;
     this->zero();
 }
