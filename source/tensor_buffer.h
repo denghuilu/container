@@ -43,6 +43,11 @@ namespace container {
      void* data() const;
 
      /**
+      * @brief resize the tensor buffer
+      */
+     void resize(size_t size);
+
+     /**
       * @brief Get the size of the buffer.
       *
       * @return size_t The size of the buffer in bytes.
@@ -93,7 +98,7 @@ namespace container {
      DeviceType GetDeviceType() const;
 
    private:
-     void* const data_;  ///< Pointer to the underlying data buffer.
+     void* data_;  ///< Pointer to the underlying data buffer.
      Allocator* const alloc_; ///< Pointer to the allocator used for memory allocation.
      bool owns_memory; ///< Bool to indicate whether this tensor owns it's memory.
 };

@@ -187,6 +187,16 @@ Tensor Tensor::slice(const std::vector<int> &start, const std::vector<int> &size
     return output;
 }
 
+// Resize tensor object with the given tensor_shape
+void Tensor::resize(const TensorShape& new_shape) {
+    if (shape_ == new_shape) {
+        return;
+    }
+    buffer_.resize(new_shape.NumElements());
+    shape_ = new_shape;
+    this->zero();
+}
+
 // Overloaded operator<< for the Tensor class.
 std::ostream& operator<<(std::ostream& os, const Tensor& tensor) {
     const int64_t num_elements = tensor.NumElements();

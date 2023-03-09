@@ -226,6 +226,21 @@ class Tensor {
      */
     Tensor slice(const std::vector<int>& start, const std::vector<int>& size) const;
 
+    /**
+     * @brief Resize the tensor to the new shape.
+     *
+     * The tensor will be resized to the new shape, and its data buffer will be reallocated
+     * if necessary. If the new shape has a different number of elements than the current
+     * shape, the data buffer will be reallocated. If the new shape has the same number of
+     * elements as the current shape, the data buffer will not be reallocated, but the
+     * shape of the tensor will be updated.
+     *
+     * @param new_shape The new shape of the tensor.
+     *
+     * @note This method will automatically zero the resized tensor object.
+     */
+    virtual void resize(const TensorShape& new_shape);
+
 protected:
     /**
      * @brief Constructor that creates a tensor with the given data pointer,

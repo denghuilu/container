@@ -38,6 +38,8 @@ int main() {
     t5.zero();
     t5.reshape({6, 2});
 
+    t7.resize({3, 3, 4});
+
     std::vector<container::Tensor*> tensors {&t1, &t2, &t3, &t4, &t5, &t6, &t7};
     // std::vector<container::Tensor*> tensors {&t2};
 

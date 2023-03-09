@@ -31,6 +31,19 @@ namespace container {
      * @param shape The shape of the tensor.
      */
     TensorMap(void *data, DataType data_type, DeviceType device, const TensorShape &shape);
+
+     /**
+      * @brief Resize the tensor to the new shape.
+      *
+      * The tensor will be resized to the new shape, and its data buffer will be reallocated
+      * if necessary. If the new shape has a different number of elements than the current
+      * shape, the data buffer will be reallocated. If the new shape has the same number of
+      * elements as the current shape, the data buffer will not be reallocated, but the
+      * shape of the tensor will be updated.
+      *
+      * @param new_shape The new shape of the tensor.
+      */
+     virtual void resize(const TensorShape& new_shape);
 };
 
 } // namespace container
