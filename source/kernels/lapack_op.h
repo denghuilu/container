@@ -1,5 +1,5 @@
-#ifndef CONTAINER_KERNELS_LAPACK_OP_H
-#define CONTAINER_KERNELS_LAPACK_OP_H
+#ifndef CONTAINER_KERNELS_LAPACK_OP_H_
+#define CONTAINER_KERNELS_LAPACK_OP_H_
 
 #include "../tensor.h"
 #include "../tensor_types.h"
@@ -124,4 +124,4 @@ void destroyCusolverHandle();
 } // namespace container
 } // namespace op
 
-#endif // CONTAINER_KERNELS_LAPACK_OP_H
+#endif // CONTAINER_KERNELS_LAPACK_OP_H_

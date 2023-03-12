@@ -1,5 +1,5 @@
-#ifndef CONTAINER_KERNELS_BLAS_OP_H
-#define CONTAINER_KERNELS_BLAS_OP_H
+#ifndef CONTAINER_KERNELS_BLAS_OP_H_
+#define CONTAINER_KERNELS_BLAS_OP_H_
 
 #include "../tensor.h"
 #include "../tensor_types.h"
@@ -201,4 +201,4 @@ void destoryBlasHandle();
 } // namespace op
 } // namespace container
 
-#endif // CONTAINER_KERNELS_BLAS_OP_H
+#endif // CONTAINER_KERNELS_BLAS_OP_H_

@@ -1,5 +1,5 @@
-#ifndef CONTAINER_KERNELS_THIRD_PARTY_LAPACK_CONNECTOR_H
-#define CONTAINER_KERNELS_THIRD_PARTY_LAPACK_CONNECTOR_H
+#ifndef CONTAINER_KERNELS_THIRD_PARTY_LAPACK_CONNECTOR_H_
+#define CONTAINER_KERNELS_THIRD_PARTY_LAPACK_CONNECTOR_H_
 
 #include <complex>
 
@@ -150,4 +150,4 @@ void xheevx( const int itype, const char jobz, const char range, const char uplo
             work, &lwork, rwork, iwork, ifail, &info);
 }
 };
-#endif  // CONTAINER_KERNELS_THIRD_PARTY_LAPACK_CONNECTOR_H
+#endif  // CONTAINER_KERNELS_THIRD_PARTY_LAPACK_CONNECTOR_H_

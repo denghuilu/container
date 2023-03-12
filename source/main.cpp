@@ -3,6 +3,7 @@
 
 #include "tensor.h"
 #include "tensor_map.h"
+#include "kernels/einsum_op.h"
 
 int main() {
 
@@ -46,6 +47,9 @@ int main() {
     for (const container::Tensor* t : tensors) {
         std::cout << *t << std::endl;
     }
+
+    // Do something really interested.
+    auto t8 = container::op::einsum("mk,kn->mn", &t1, &t1);
     // TODO:
     // Add some math operations,
     // Unit test
