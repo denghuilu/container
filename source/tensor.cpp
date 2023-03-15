@@ -1,6 +1,5 @@
 #include <cmath>
 #include <iostream>
-#include <iomanip>
 #include <complex>
 
 #include "tensor.h"
@@ -17,8 +16,7 @@ Tensor::Tensor(DataType data_type, const TensorShape& shape)
           shape_(shape),
           device_(DeviceType::CpuDevice),
           allocator_(GetAllocator(device_)),
-          buffer_(allocator_, allocator_->allocate(shape.NumElements() * SizeOfType(data_type))) {
-}
+          buffer_(allocator_, allocator_->allocate(shape.NumElements() * SizeOfType(data_type))) {}
 
 // Constructor that creates a tensor with the given data pointer, data type, device type and shape.
 Tensor::Tensor(void *data, DataType data_type, DeviceType device, const TensorShape &shape)

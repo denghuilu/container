@@ -49,7 +49,7 @@ int main() {
     }
 
     // Do something really interested.
-    auto t8 = container::op::einsum("mk,kn->mn", &t1, &t1);
+    auto t8 = container::op::einsum("ij,jk->ik", &t1, &t1);
     // TODO:
     // Add some math operations,
     // Unit test
